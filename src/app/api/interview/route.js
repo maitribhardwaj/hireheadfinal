@@ -51,7 +51,7 @@ function analyzeInterviewContent(transcript, questions) {
 
     const words = transcript.toLowerCase().split(/\s+/);
     const wordCount = words.length;
-    
+
     // Basic analysis metrics
     const metrics = {
         wordCount,
@@ -66,7 +66,7 @@ function analyzeInterviewContent(transcript, questions) {
     const communicationScore = calculateCommunicationScore(metrics);
     const confidenceScore = calculateConfidenceScore(metrics);
     const contentScore = calculateContentScore(metrics);
-    
+
     const overallScore = Math.round((communicationScore + confidenceScore + contentScore) / 3);
 
     // Generate feedback
@@ -114,7 +114,7 @@ function countTechnicalTerms(words) {
 function analyzeSentenceComplexity(transcript) {
     const sentences = transcript.split(/[.!?]+/).filter(s => s.trim().length > 0);
     const avgWordsPerSentence = transcript.split(/\s+/).length / sentences.length;
-    
+
     if (avgWordsPerSentence > 20) return 'complex';
     if (avgWordsPerSentence > 12) return 'moderate';
     return 'simple';
@@ -122,64 +122,64 @@ function analyzeSentenceComplexity(transcript) {
 
 function calculateCommunicationScore(metrics) {
     let score = 5; // Base score
-    
+
     // Word count factor
     if (metrics.wordCount > 200) score += 2;
     else if (metrics.wordCount > 100) score += 1;
     else if (metrics.wordCount < 50) score -= 2;
-    
+
     // Filler words penalty
     const fillerRatio = metrics.fillerWords / metrics.wordCount;
     if (fillerRatio > 0.1) score -= 2;
     else if (fillerRatio > 0.05) score -= 1;
-    
+
     // Sentence complexity bonus
     if (metrics.sentenceComplexity === 'complex') score += 1;
     else if (metrics.sentenceComplexity === 'simple') score -= 1;
-    
+
     return Math.max(1, Math.min(10, score));
 }
 
 function calculateConfidenceScore(metrics) {
     let score = 5; // Base score
-    
+
     // Positive words boost confidence
     if (metrics.positiveWords > 5) score += 2;
     else if (metrics.positiveWords > 2) score += 1;
-    
+
     // Filler words reduce confidence
     const fillerRatio = metrics.fillerWords / metrics.wordCount;
     if (fillerRatio > 0.1) score -= 3;
     else if (fillerRatio > 0.05) score -= 1;
-    
+
     // Word count indicates confidence
     if (metrics.wordCount > 150) score += 1;
     else if (metrics.wordCount < 50) score -= 2;
-    
+
     return Math.max(1, Math.min(10, score));
 }
 
 function calculateContentScore(metrics) {
     let score = 5; // Base score
-    
+
     // Technical terms show expertise
     if (metrics.technicalTerms > 3) score += 2;
     else if (metrics.technicalTerms > 1) score += 1;
-    
+
     // Word count per question
     if (metrics.averageWordsPerQuestion > 40) score += 2;
     else if (metrics.averageWordsPerQuestion > 20) score += 1;
     else if (metrics.averageWordsPerQuestion < 10) score -= 2;
-    
+
     // Positive words indicate good content
     if (metrics.positiveWords > 3) score += 1;
-    
+
     return Math.max(1, Math.min(10, score));
 }
 
 function generateFeedback(metrics, scores) {
     let feedback = [];
-    
+
     // Overall performance
     if (scores.overall >= 8) {
         feedback.push("🎉 Excellent performance! You demonstrated strong communication skills and confidence.");
@@ -188,14 +188,14 @@ function generateFeedback(metrics, scores) {
     } else {
         feedback.push("💪 Keep practicing! There are several areas where you can improve your interview performance.");
     }
-    
+
     // Communication feedback
     if (scores.communication >= 8) {
         feedback.push("✅ Your communication was clear and well-structured.");
     } else if (scores.communication <= 4) {
         feedback.push("📢 Focus on speaking more clearly and providing more detailed responses.");
     }
-    
+
     // Confidence feedback
     if (scores.confidence >= 8) {
         feedback.push("💪 You spoke with great confidence and used positive language.");
@@ -206,7 +206,7 @@ function generateFeedback(metrics, scores) {
         }
         feedback.push("🌟 Use more positive and assertive language to boost your confidence.");
     }
-    
+
     // Content feedback
     if (scores.content >= 8) {
         feedback.push("📚 Your responses showed good depth and relevant experience.");
@@ -216,20 +216,20 @@ function generateFeedback(metrics, scores) {
             feedback.push("🔧 Include relevant technical terms and industry knowledge when appropriate.");
         }
     }
-    
+
     // Specific improvements
     if (metrics.wordCount < 100) {
         feedback.push("⏱️ Try to elaborate more on your answers - aim for 30-60 seconds per response.");
     }
-    
+
     if (metrics.averageWordsPerQuestion < 20) {
         feedback.push("📝 Provide more comprehensive answers with specific examples and details.");
     }
-    
+
     // Positive reinforcement
     if (metrics.positiveWords > 0) {
         feedback.push("✨ Great use of positive language - this shows enthusiasm and professionalism.");
     }
-    
+
     return feedback.join(' ');
 }

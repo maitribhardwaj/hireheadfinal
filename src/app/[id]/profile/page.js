@@ -28,6 +28,8 @@ export default function ProfilePage() {
         skills: [],
         education: [],
         certifications: [],
+        preferredJobLocations: [],
+        preferredJobRoles: [],
         socialLinks: {
             linkedin: '',
             github: '',
@@ -88,6 +90,8 @@ export default function ProfilePage() {
                 skills: [],
                 education: [],
                 certifications: [],
+                preferredJobLocations: [],
+                preferredJobRoles: [],
                 socialLinks: {
                     linkedin: '',
                     github: '',
@@ -133,6 +137,8 @@ export default function ProfilePage() {
                 skills: [],
                 education: [],
                 certifications: [],
+                preferredJobLocations: [],
+                preferredJobRoles: [],
                 socialLinks: {
                     linkedin: '',
                     github: '',
@@ -253,6 +259,10 @@ export default function ProfilePage() {
 
     const [newSkill, setNewSkill] = useState('');
     const [showSkillInput, setShowSkillInput] = useState(false);
+    const [newJobLocation, setNewJobLocation] = useState('');
+    const [showJobLocationInput, setShowJobLocationInput] = useState(false);
+    const [newJobRole, setNewJobRole] = useState('');
+    const [showJobRoleInput, setShowJobRoleInput] = useState(false);
 
     const addSkill = () => {
         setShowSkillInput(true);
@@ -269,6 +279,52 @@ export default function ProfilePage() {
     const cancelNewSkill = () => {
         setNewSkill('');
         setShowSkillInput(false);
+    };
+
+    // Job Location functions
+    const addJobLocation = () => {
+        setShowJobLocationInput(true);
+    };
+
+    const saveNewJobLocation = () => {
+        if (newJobLocation && newJobLocation.trim()) {
+            updateTempData('preferredJobLocations', [...(tempData.preferredJobLocations || []), newJobLocation.trim()]);
+            setNewJobLocation('');
+            setShowJobLocationInput(false);
+        }
+    };
+
+    const cancelNewJobLocation = () => {
+        setNewJobLocation('');
+        setShowJobLocationInput(false);
+    };
+
+    const removeJobLocation = (index) => {
+        const updatedLocations = (tempData.preferredJobLocations || []).filter((_, i) => i !== index);
+        updateTempData('preferredJobLocations', updatedLocations);
+    };
+
+    // Job Role functions
+    const addJobRole = () => {
+        setShowJobRoleInput(true);
+    };
+
+    const saveNewJobRole = () => {
+        if (newJobRole && newJobRole.trim()) {
+            updateTempData('preferredJobRoles', [...(tempData.preferredJobRoles || []), newJobRole.trim()]);
+            setNewJobRole('');
+            setShowJobRoleInput(false);
+        }
+    };
+
+    const cancelNewJobRole = () => {
+        setNewJobRole('');
+        setShowJobRoleInput(false);
+    };
+
+    const removeJobRole = (index) => {
+        const updatedRoles = (tempData.preferredJobRoles || []).filter((_, i) => i !== index);
+        updateTempData('preferredJobRoles', updatedRoles);
     };
 
     const removeSkill = (index) => {
@@ -346,35 +402,40 @@ export default function ProfilePage() {
     return (
         <div className="p-8 bg-gray-100 min-h-screen">
             <div className="max-w-4xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
-                    {!isEditing ? (
-                        <button
-                            onClick={startEditing}
-                            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            <Edit3 size={16} />
-                            <span>Edit Profile</span>
-                        </button>
-                    ) : (
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={saveProfile}
-                                disabled={loading}
-                                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                            >
-                                <Save size={16} />
-                                <span>{loading ? 'Saving...' : 'Save'}</span>
-                            </button>
-                            <button
-                                onClick={cancelEditing}
-                                className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                            >
-                                <X size={16} />
-                                <span>Cancel</span>
-                            </button>
+                <div className="mb-8">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-800 mb-2">Profile Settings</h1>
+                            <p className="text-gray-600">Manage your personal information and career preferences</p>
                         </div>
-                    )}
+                        {!isEditing ? (
+                            <button
+                                onClick={startEditing}
+                                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                <Edit3 size={16} />
+                                <span>Edit Profile</span>
+                            </button>
+                        ) : (
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={saveProfile}
+                                    disabled={loading}
+                                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                                >
+                                    <Save size={16} />
+                                    <span>{loading ? 'Saving...' : 'Save'}</span>
+                                </button>
+                                <button
+                                    onClick={cancelEditing}
+                                    className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    <X size={16} />
+                                    <span>Cancel</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Success Message */}
@@ -578,6 +639,146 @@ export default function ProfilePage() {
                         </div>
                     ) : (
                         <p className="text-gray-500">No skills added yet.</p>
+                    )}
+                </div>
+
+                {/* Preferred Job Locations */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold text-gray-800">Preferred Job Locations</h2>
+                        {isEditing && !showJobLocationInput && (
+                            <button
+                                onClick={addJobLocation}
+                                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
+                            >
+                                <Plus size={16} />
+                                <span>Add Location</span>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Inline location input */}
+                    {isEditing && showJobLocationInput && (
+                        <div className="mb-4 flex items-center space-x-2">
+                            <input
+                                type="text"
+                                value={newJobLocation}
+                                onChange={(e) => setNewJobLocation(e.target.value)}
+                                placeholder="Enter preferred job location"
+                                className="flex-1 p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        saveNewJobLocation();
+                                    } else if (e.key === 'Escape') {
+                                        cancelNewJobLocation();
+                                    }
+                                }}
+                                autoFocus
+                            />
+                            <button
+                                onClick={saveNewJobLocation}
+                                className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                            >
+                                Add
+                            </button>
+                            <button
+                                onClick={cancelNewJobLocation}
+                                className="bg-gray-400 text-white px-3 py-2 rounded hover:bg-gray-500"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+
+                    {(currentData.preferredJobLocations || []).length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {(currentData.preferredJobLocations || []).map((location, index) => (
+                                <div key={index} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                                    <MapPin size={14} className="mr-1" />
+                                    <span>{location}</span>
+                                    {isEditing && (
+                                        <button
+                                            onClick={() => removeJobLocation(index)}
+                                            className="ml-2 text-green-600 hover:text-green-800"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No preferred job locations added yet.</p>
+                    )}
+                </div>
+
+                {/* Preferred Job Roles */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold text-gray-800">Preferred Job Roles</h2>
+                        {isEditing && !showJobRoleInput && (
+                            <button
+                                onClick={addJobRole}
+                                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
+                            >
+                                <Plus size={16} />
+                                <span>Add Role</span>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Inline role input */}
+                    {isEditing && showJobRoleInput && (
+                        <div className="mb-4 flex items-center space-x-2">
+                            <input
+                                type="text"
+                                value={newJobRole}
+                                onChange={(e) => setNewJobRole(e.target.value)}
+                                placeholder="Enter preferred job role"
+                                className="flex-1 p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        saveNewJobRole();
+                                    } else if (e.key === 'Escape') {
+                                        cancelNewJobRole();
+                                    }
+                                }}
+                                autoFocus
+                            />
+                            <button
+                                onClick={saveNewJobRole}
+                                className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                            >
+                                Add
+                            </button>
+                            <button
+                                onClick={cancelNewJobRole}
+                                className="bg-gray-400 text-white px-3 py-2 rounded hover:bg-gray-500"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+
+                    {(currentData.preferredJobRoles || []).length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {(currentData.preferredJobRoles || []).map((role, index) => (
+                                <div key={index} className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
+                                    <Briefcase size={14} className="mr-1" />
+                                    <span>{role}</span>
+                                    {isEditing && (
+                                        <button
+                                            onClick={() => removeJobRole(index)}
+                                            className="ml-2 text-purple-600 hover:text-purple-800"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No preferred job roles added yet.</p>
                     )}
                 </div>
 

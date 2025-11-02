@@ -217,14 +217,9 @@ export default function RoadmapPage() {
     return (
         <div className="p-8 bg-gray-100 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                        Choose Your Learning Path, {getDisplayName()}
-                    </h1>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Select a skill to explore a comprehensive roadmap tailored to your career goals. 
-                        Each path includes structured learning modules, practical projects, and industry insights.
-                    </p>
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Learning Roadmaps</h1>
+                    <p className="text-gray-600">Choose your learning path and follow structured roadmaps to advance your career</p>
                 </div>
 
                 {skillCategories.map((category) => (

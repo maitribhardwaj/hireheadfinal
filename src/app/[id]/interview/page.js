@@ -276,9 +276,10 @@ export default function InterviewPage() {
     return (
         <div className="p-8 bg-gray-100 min-h-screen">
             <div className="max-w-4xl mx-auto">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">
-                    AI Interview Practice - {getDisplayName()}
-                </h1>
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Interview Practice</h1>
+                    <p className="text-gray-600">Practice interviews with AI feedback to improve your performance</p>
+                </div>
 
                 {/* Error Display */}
                 {error && (

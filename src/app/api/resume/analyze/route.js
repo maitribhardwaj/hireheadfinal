@@ -15,8 +15,31 @@ export async function POST(request) {
         // Convert file to text for analysis
         const fileText = await resumeFile.text();
 
+        // Get userId from form data
+        const userId = formData.get('userId');
+        
         // Perform real analysis on the resume content
         const analysis = await performRealResumeAnalysis(fileText, resumeFile.name);
+
+        // Store analysis results in Firebase - ALWAYS attempt to store
+        if (userId) {
+            try {
+                await storeResumeAnalysis(userId, analysis);
+                console.log('✅ Analysis stored in Firebase for user:', userId);
+                
+                // Add storage confirmation to response
+                analysis.storedInFirebase = true;
+                analysis.storageTimestamp = new Date().toISOString();
+            } catch (firebaseError) {
+                console.error('❌ Failed to store analysis in Firebase:', firebaseError);
+                analysis.storedInFirebase = false;
+                analysis.storageError = firebaseError.message;
+            }
+        } else {
+            console.warn('⚠️ No userId provided - analysis will not be stored');
+            analysis.storedInFirebase = false;
+            analysis.storageError = 'No user ID provided';
+        }
 
         return NextResponse.json(analysis);
 
@@ -26,6 +49,86 @@ export async function POST(request) {
             { error: 'Failed to analyze resume' },
             { status: 500 }
         );
+    }
+}
+
+async function storeResumeAnalysis(userId, analysis) {
+    try {
+        console.log('💾 Attempting to store resume analysis for user:', userId);
+        console.log('📊 Analysis data to store:', {
+            atsScore: analysis.atsScore,
+            fileName: analysis.fileName,
+            hasStrengths: !!analysis.strengths,
+            hasImprovements: !!analysis.improvements
+        });
+
+        // Import Firebase modules dynamically
+        const { db } = await import("@/config/firebase");
+        const { doc, setDoc } = await import("firebase/firestore");
+        
+        const resumeDoc = doc(db, 'resumeAnalyses', userId);
+        
+        // Prepare data for storage
+        const dataToStore = {
+            // Core scores
+            atsScore: analysis.atsScore,
+            formatScore: analysis.formatScore,
+            contentScore: analysis.contentScore,
+            keywordScore: analysis.keywordScore,
+            
+            // File info
+            fileName: analysis.fileName,
+            analysisDate: analysis.analysisDate,
+            dataSource: analysis.dataSource,
+            
+            // Feedback arrays (convert to simple arrays for Firebase)
+            strengths: analysis.strengths || [],
+            improvements: analysis.improvements || [],
+            recommendations: analysis.recommendations || [],
+            
+            // Detailed analysis (flatten complex objects)
+            detailedAnalysis: JSON.stringify(analysis.detailedAnalysis || {}),
+            industryInsights: JSON.stringify(analysis.industryInsights || []),
+            
+            // Metadata
+            userId: userId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        console.log('📝 Storing data structure:', Object.keys(dataToStore));
+        
+        // Store the analysis with merge option (overwrites previous analysis)
+        await setDoc(resumeDoc, dataToStore, { merge: false }); // Use merge: false to completely replace
+        
+        console.log('✅ Resume analysis successfully stored in Firebase for user:', userId);
+        
+        // Verify the data was stored by reading it back
+        const { getDoc } = await import("firebase/firestore");
+        const verifyDoc = await getDoc(resumeDoc);
+        if (verifyDoc.exists()) {
+            const storedData = verifyDoc.data();
+            console.log('✅ Verification: Data exists in Firebase with ATS score:', storedData.atsScore);
+            console.log('📊 Stored data summary:', {
+                atsScore: storedData.atsScore,
+                fileName: storedData.fileName,
+                analysisDate: storedData.analysisDate,
+                strengthsCount: storedData.strengths?.length || 0,
+                improvementsCount: storedData.improvements?.length || 0
+            });
+        } else {
+            console.log('❌ Verification failed: Document not found after storage');
+            throw new Error('Failed to verify data storage');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error storing resume analysis:', error);
+        console.error('❌ Error details:', {
+            message: error.message,
+            code: error.code,
+            stack: error.stack
+        });
+        throw error;
     }
 }
 
