@@ -8,8 +8,9 @@ import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import {
     User, Mail, Calendar, MapPin, Edit3, Save, X,
     GraduationCap, Award, Briefcase, FileText,
-    Phone, Globe, Github, Linkedin, Plus, Trash2
+    Phone, Globe, Github, Linkedin, Plus, Trash2, Download
 } from "lucide-react";
+import PDFExport from "../../../components/PDFExport";
 
 export default function ProfilePage() {
     const params = useParams();
@@ -37,6 +38,7 @@ export default function ProfilePage() {
         }
     });
     const [tempData, setTempData] = useState({});
+    const [showExportDialog, setShowExportDialog] = useState(false);
 
     useEffect(() => {
         let profileUnsubscribe = null;
@@ -380,6 +382,15 @@ export default function ProfilePage() {
         updateTempData('certifications', updatedCerts);
     };
 
+    // PDF Export Functions
+    const handleExportClick = () => {
+        setShowExportDialog(true);
+    };
+
+    const handleCloseExportDialog = () => {
+        setShowExportDialog(false);
+    };
+
     if (!user) return null;
 
     if (initialLoading) {
@@ -409,13 +420,22 @@ export default function ProfilePage() {
                             <p className="text-gray-600">Manage your personal information and career preferences</p>
                         </div>
                         {!isEditing ? (
-                            <button
-                                onClick={startEditing}
-                                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                            >
-                                <Edit3 size={16} />
-                                <span>Edit Profile</span>
-                            </button>
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={handleExportClick}
+                                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    <Download size={16} />
+                                    <span>Export PDF</span>
+                                </button>
+                                <button
+                                    onClick={startEditing}
+                                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    <Edit3 size={16} />
+                                    <span>Edit Profile</span>
+                                </button>
+                            </div>
                         ) : (
                             <div className="flex space-x-2">
                                 <button
@@ -1024,6 +1044,14 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 </div>
+
+                {/* PDF Export Dialog */}
+                {showExportDialog && (
+                    <PDFExport 
+                        profileData={profileData}
+                        onClose={handleCloseExportDialog}
+                    />
+                )}
             </div>
         </div>
     );
