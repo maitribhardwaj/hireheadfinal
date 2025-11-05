@@ -321,15 +321,15 @@ export default function InterviewPage() {
 
                 {!sessionStarted && !sessionComplete && (
                     <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                        <h2 className="text-2xl font-semibold mb-4">Welcome to AI Interview Practice</h2>
-                        <p className="text-gray-600 mb-6">
+                        <h2 className="text-gray-900 text-2xl font-semibold mb-4">Welcome to AI Interview Practice</h2>
+                        <p className="text-gray-900 mb-6">
                             This session will record your video responses to common interview questions. 
                             Your performance will be analyzed and rated based on communication skills, 
                             confidence, and content quality.
                         </p>
                         <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                            <h3 className="font-semibold mb-2">You'll be asked {interviewQuestions.length} questions:</h3>
-                            <ul className="text-left text-sm space-y-1">
+                            <h3 className="font-semibold text-gray-900 mb-2">You'll be asked {interviewQuestions.length} questions:</h3>
+                            <ul className="text-left text-gray-900 text-sm space-y-1">
                                 {interviewQuestions.map((question, index) => (
                                     <li key={index} className="flex items-start space-x-2">
                                         <span className="text-blue-600 font-semibold">{index + 1}.</span>

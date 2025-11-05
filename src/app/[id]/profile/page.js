@@ -6,10 +6,10 @@ import { auth, db } from "../../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import {
-    User, Mail, Calendar, MapPin, Edit3, Save, X,
-    GraduationCap, Award, Briefcase, FileText,
-    Phone, Globe, Github, Linkedin, Plus, Trash2, Download
-} from "lucide-react";
+    IconUser, IconMail, IconCalendar, IconMapPin, IconEdit, IconDeviceFloppy, IconX,
+    IconSchool, IconAward, IconBriefcase, IconFileText,
+    IconPhone, IconWorld, IconBrandGithub, IconBrandLinkedin, IconPlus, IconTrash, IconDownload
+} from "@tabler/icons-react";
 import PDFExport from "../../../components/PDFExport";
 
 export default function ProfilePage() {
@@ -411,182 +411,446 @@ export default function ProfilePage() {
     const currentData = isEditing ? tempData : profileData;
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <div className="max-w-4xl mx-auto">
-                <div className="mb-8">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-800 mb-2">Profile Settings</h1>
-                            <p className="text-gray-600">Manage your personal information and career preferences</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            {/* Modern Header with Glassmorphism */}
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <IconUser className="text-white" size={24} />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                    Profile Settings
+                                </h1>
+                                <p className="text-gray-600 text-sm sm:text-base">Manage your professional profile</p>
+                            </div>
                         </div>
-                        {!isEditing ? (
-                            <div className="flex space-x-3">
-                                <button
-                                    onClick={handleExportClick}
-                                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                                >
-                                    <Download size={16} />
-                                    <span>Export PDF</span>
-                                </button>
-                                <button
-                                    onClick={startEditing}
-                                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    <Edit3 size={16} />
-                                    <span>Edit Profile</span>
-                                </button>
+                        
+                        {/* Modern Action Buttons */}
+                        <div className="flex flex-wrap gap-2 sm:gap-3">
+                            {!isEditing ? (
+                                <>
+                                    <button
+                                        onClick={handleExportClick}
+                                        className="group flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-2.5 rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
+                                    >
+                                        <IconDownload size={16} className="group-hover:scale-110 transition-transform" />
+                                        <span>Export PDF</span>
+                                    </button>
+                                    <button
+                                        onClick={startEditing}
+                                        className="group flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2.5 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
+                                    >
+                                        <IconEdit size={16} className="group-hover:scale-110 transition-transform" />
+                                        <span>Edit Profile</span>
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={saveProfile}
+                                        disabled={loading}
+                                        className="group flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-2.5 rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none text-sm font-medium"
+                                    >
+                                        <IconDeviceFloppy size={16} className="group-hover:scale-110 transition-transform" />
+                                        <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+                                    </button>
+                                    <button
+                                        onClick={cancelEditing}
+                                        className="group flex items-center space-x-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2.5 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
+                                    >
+                                        <IconX size={16} className="group-hover:scale-110 transition-transform" />
+                                        <span>Cancel</span>
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                    {/* Modern Success Message */}
+                    {saveSuccess && (
+                        <div className="lg:col-span-4 mb-6">
+                            <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-6 shadow-lg backdrop-blur-sm">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+                                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-emerald-800">Profile Updated Successfully!</h3>
+                                        <p className="text-emerald-700 text-sm">Your changes have been saved and are now live across the platform.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modern Profile Header Card */}
+                    <div className="lg:col-span-3">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 mb-8">
+                            {/* Profile Avatar and Name */}
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
+                                <div className="relative group">
+                                    <div className="w-32 h-32 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl transform group-hover:scale-105 transition-all duration-300">
+                                        {user?.photoURL ? (
+                                            <img src={user.photoURL} alt="Profile" className="w-full h-full rounded-3xl object-cover" />
+                                        ) : (
+                                            <IconUser size={48} className="text-white" />
+                                        )}
+                                    </div>
+                                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex-1 text-center sm:text-left">
+                                    {isEditing ? (
+                                        <div className="space-y-2">
+                                            <input
+                                                type="text"
+                                                value={currentData.displayName || ''}
+                                                onChange={(e) => updateTempData('displayName', e.target.value)}
+                                                placeholder="Enter your full name"
+                                                className="text-2xl lg:text-3xl font-bold bg-transparent border-b-2 border-gray-300 focus:border-blue-500 outline-none w-full transition-all duration-200 text-gray-900"
+                                            />
+                                            <p className="text-gray-500 text-sm">Update your display name</p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                                                {currentData.displayName || getDisplayName()}
+                                            </h1>
+                                            <p className="text-gray-600 text-lg">Professional Profile</p>
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                                    Active
+                                                </span>
+                                                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                                    Verified
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Contact Information Section */}
+                            <div className="mt-8">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                                        Contact Information
+                                    </h3>
+                                    <div className="flex space-x-1">
+                                        <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+                                        <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+                                        <div className="w-1 h-1 bg-pink-400 rounded-full"></div>
+                                    </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Email Card */}
+                                    <div className="group relative overflow-hidden h-32">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                                        <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+                                            <div className="flex items-center space-x-3 mb-3">
+                                                <div className="relative">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                                        <IconMail className="text-white" size={20} />
+                                                    </div>
+                                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-300 rounded-full"></div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-gray-900 text-sm">Email Address</h4>
+                                                </div>
+                                            </div>
+                                            <div className="ml-15">
+                                                {isEditing ? (
+                                                    <input
+                                                        type="email"
+                                                        value={currentData.email || ''}
+                                                        onChange={(e) => updateTempData('email', e.target.value)}
+                                                        placeholder="your.email@example.com"
+                                                        className="w-full text-sm text-gray-900 bg-white/70 border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                                    />
+                                                ) : (
+                                                    <p className="text-sm text-gray-700 font-medium truncate">{currentData.email || 'Not provided'}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Phone Card */}
+                                    <div className="group relative overflow-hidden h-32">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                                        <div className="relative bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-5 border border-emerald-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+                                            <div className="flex items-center space-x-3 mb-3">
+                                                <div className="relative">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                                                        <IconPhone className="text-white" size={20} />
+                                                    </div>
+                                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-300 rounded-full"></div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-gray-900 text-sm">Phone Number</h4>
+                                                </div>
+                                            </div>
+                                            <div className="ml-15">
+                                                {isEditing ? (
+                                                    <input
+                                                        type="tel"
+                                                        value={currentData.phone || ''}
+                                                        onChange={(e) => updateTempData('phone', e.target.value)}
+                                                        placeholder="+1 (555) 123-4567"
+                                                        className="w-full text-sm text-gray-900 bg-white/70 border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                                                    />
+                                                ) : (
+                                                    <p className="text-sm text-gray-700 font-medium">{currentData.phone || 'Not provided'}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Date of Birth Card */}
+                                    <div className="group relative overflow-hidden h-32">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                                        <div className="relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+                                            <div className="flex items-center space-x-3 mb-3">
+                                                <div className="relative">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                                                        <IconCalendar className="text-white" size={20} />
+                                                    </div>
+                                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-300 rounded-full"></div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-gray-900 text-sm">Date of Birth</h4>
+                                                </div>
+                                            </div>
+                                            <div className="ml-15">
+                                                {isEditing ? (
+                                                    <input
+                                                        type="date"
+                                                        value={currentData.dateOfBirth || ''}
+                                                        onChange={(e) => updateTempData('dateOfBirth', e.target.value)}
+                                                        className="w-full text-sm text-gray-900 bg-white/70 border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                                                    />
+                                                ) : (
+                                                    <p className="text-sm text-gray-700 font-medium">{currentData.dateOfBirth ? new Date(currentData.dateOfBirth).toLocaleDateString() : 'Not provided'}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Location Card */}
+                                    <div className="group relative overflow-hidden h-32">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                                        <div className="relative bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-5 border border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+                                            <div className="flex items-center space-x-3 mb-3">
+                                                <div className="relative">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                                                        <IconMapPin className="text-white" size={20} />
+                                                    </div>
+                                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-300 rounded-full"></div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-gray-900 text-sm">Location</h4>
+                                                </div>
+                                            </div>
+                                            <div className="ml-15">
+                                                {isEditing ? (
+                                                    <input
+                                                        type="text"
+                                                        value={currentData.location || ''}
+                                                        onChange={(e) => updateTempData('location', e.target.value)}
+                                                        placeholder="City, State, Country"
+                                                        className="w-full text-sm text-gray-900 bg-white/70 border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                                                    />
+                                                ) : (
+                                                    <p className="text-sm text-gray-700 font-medium">{currentData.location || 'Not provided'}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sidebar with Quick Stats */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-24 space-y-6">
+                            {/* Profile Completion Card */}
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-4">
+                                <div className="text-center">
+                                    <div className="relative w-16 h-16 mx-auto mb-3">
+                                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
+                                            <circle
+                                                cx="50"
+                                                cy="50"
+                                                r="40"
+                                                stroke="currentColor"
+                                                strokeWidth="8"
+                                                fill="transparent"
+                                                className="text-gray-200"
+                                            />
+                                            <circle
+                                                cx="50"
+                                                cy="50"
+                                                r="40"
+                                                stroke="currentColor"
+                                                strokeWidth="8"
+                                                fill="transparent"
+                                                strokeDasharray={`${2 * Math.PI * 40}`}
+                                                strokeDashoffset={`${2 * Math.PI * 40 * (1 - (profileData ? 75 : 0) / 100)}`}
+                                                className="text-blue-500 transition-all duration-500"
+                                            />
+                                        </svg>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="text-center">
+                                                <div className="text-lg font-bold text-gray-900">75%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h3 className="font-medium text-gray-900 text-sm mb-1">Profile</h3>
+                                    <p className="text-gray-600 text-xs">75% Complete</p>
+                                </div>
+                            </div>
+
+                            {/* Quick Actions Card */}
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-4">
+                                <h3 className="font-medium text-gray-900 text-sm mb-3">Actions</h3>
+                                <div className="space-y-2">
+                                    <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 text-xs font-medium">
+                                        Dashboard
+                                    </button>
+                                    <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 text-xs font-medium">
+                                        Jobs
+                                    </button>
+                                    <button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 text-xs font-medium">
+                                        Resume
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Social Links Card */}
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-4">
+                                <h3 className="font-medium text-gray-900 text-sm mb-3">Links</h3>
+                                <div className="space-y-3">
+                                    {/* LinkedIn */}
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <IconBrandLinkedin className="text-blue-600" size={14} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            {isEditing ? (
+                                                <input
+                                                    type="url"
+                                                    value={currentData.socialLinks?.linkedin || ''}
+                                                    onChange={(e) => updateNestedTempData('socialLinks', 'linkedin', e.target.value)}
+                                                    placeholder="LinkedIn URL"
+                                                    className="w-full text-xs text-gray-900 bg-white/50 border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none"
+                                                />
+                                            ) : (
+                                                <div className="text-xs">
+                                                    {currentData.socialLinks?.linkedin ? (
+                                                        <a href={currentData.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate block">
+                                                            LinkedIn
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-500">LinkedIn</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* GitHub */}
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <IconBrandGithub className="text-gray-700" size={14} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            {isEditing ? (
+                                                <input
+                                                    type="url"
+                                                    value={currentData.socialLinks?.github || ''}
+                                                    onChange={(e) => updateNestedTempData('socialLinks', 'github', e.target.value)}
+                                                    placeholder="GitHub URL"
+                                                    className="w-full text-xs text-gray-900 bg-white/50 border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-gray-500 focus:border-transparent outline-none"
+                                                />
+                                            ) : (
+                                                <div className="text-xs">
+                                                    {currentData.socialLinks?.github ? (
+                                                        <a href={currentData.socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate block">
+                                                            GitHub
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-500">GitHub</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Website */}
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <IconWorld className="text-green-600" size={14} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            {isEditing ? (
+                                                <input
+                                                    type="url"
+                                                    value={currentData.socialLinks?.website || ''}
+                                                    onChange={(e) => updateNestedTempData('socialLinks', 'website', e.target.value)}
+                                                    placeholder="Website URL"
+                                                    className="w-full text-xs text-gray-900 bg-white/50 border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-green-500 focus:border-transparent outline-none"
+                                                />
+                                            ) : (
+                                                <div className="text-xs">
+                                                    {currentData.socialLinks?.website ? (
+                                                        <a href={currentData.socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate block">
+                                                            Website
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-500">Website</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Profile Summary - Enhanced */}
+                    <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl lg:text-2xl font-semibold text-gray-900">Professional Summary</h2>
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        </div>
+                        {isEditing ? (
+                            <div className="space-y-2">
+                                <textarea
+                                    value={currentData.profileSummary || ''}
+                                    onChange={(e) => updateTempData('profileSummary', e.target.value)}
+                                    placeholder="Write a compelling summary about yourself, your experience, skills, and career goals. This will be the first thing employers see on your profile..."
+                                    rows={6}
+                                    className="w-full p-4 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none resize-none transition-colors text-sm"
+                                />
+                                <p className="text-xs text-gray-500">Tip: Keep it concise but impactful. Aim for 2-3 sentences that highlight your key strengths.</p>
                             </div>
                         ) : (
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={saveProfile}
-                                    disabled={loading}
-                                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                                >
-                                    <Save size={16} />
-                                    <span>{loading ? 'Saving...' : 'Save'}</span>
-                                </button>
-                                <button
-                                    onClick={cancelEditing}
-                                    className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                                >
-                                    <X size={16} />
-                                    <span>Cancel</span>
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Success Message */}
-                {saveSuccess && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                        <div className="flex items-center space-x-2">
-                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <p className="text-green-800 font-medium">Profile updated successfully!</p>
-                        </div>
-                    </div>
-                )}
-
-                {/* Basic Information */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h2>
-
-                    <div className="flex items-center mb-6">
-                        <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mr-6">
-                            {user.photoURL ? (
-                                <img src={user.photoURL} alt="Profile" className="w-20 h-20 rounded-full" />
-                            ) : (
-                                <User size={40} className="text-gray-500" />
-                            )}
-                        </div>
-                        <div className="flex-1">
-                            {isEditing ? (
-                                <input
-                                    type="text"
-                                    value={currentData.displayName || ''}
-                                    onChange={(e) => updateTempData('displayName', e.target.value)}
-                                    placeholder="Display Name"
-                                    className="text-2xl font-semibold text-gray-800 bg-transparent border-b-2 border-gray-300 focus:border-blue-500 outline-none w-full"
-                                />
-                            ) : (
-                                <h3 className="text-2xl font-semibold text-gray-800">{currentData.displayName || getDisplayName()}</h3>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Email */}
-                        <div className="flex items-center space-x-3">
-                            <Mail className="text-gray-500" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">Email</p>
-                                {isEditing ? (
-                                    <input
-                                        type="email"
-                                        value={currentData.email || ''}
-                                        onChange={(e) => updateTempData('email', e.target.value)}
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">{currentData.email || 'Not set'}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Phone */}
-                        <div className="flex items-center space-x-3">
-                            <Phone className="text-gray-500" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">Phone</p>
-                                {isEditing ? (
-                                    <input
-                                        type="tel"
-                                        value={currentData.phone || ''}
-                                        onChange={(e) => updateTempData('phone', e.target.value)}
-                                        placeholder="Phone number"
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">{currentData.phone || 'Not set'}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Date of Birth */}
-                        <div className="flex items-center space-x-3">
-                            <Calendar className="text-gray-500" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">Date of Birth</p>
-                                {isEditing ? (
-                                    <input
-                                        type="date"
-                                        value={currentData.dateOfBirth || ''}
-                                        onChange={(e) => updateTempData('dateOfBirth', e.target.value)}
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">{currentData.dateOfBirth ? new Date(currentData.dateOfBirth).toLocaleDateString() : 'Not set'}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Location */}
-                        <div className="flex items-center space-x-3">
-                            <MapPin className="text-gray-500" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">Location</p>
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        value={currentData.location || ''}
-                                        onChange={(e) => updateTempData('location', e.target.value)}
-                                        placeholder="City, Country"
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">{currentData.location || 'Not set'}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {/* Profile Summary */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Profile Summary</h2>
-                    {isEditing ? (
-                        <textarea
-                            value={currentData.profileSummary || ''}
-                            onChange={(e) => updateTempData('profileSummary', e.target.value)}
-                            placeholder="Write a brief summary about yourself, your experience, and career goals..."
-                            rows={4}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 outline-none resize-none"
-                        />
-                    ) : (
                         <p className="text-gray-700 leading-relaxed">
                             {currentData.profileSummary || 'No profile summary added yet.'}
                         </p>
@@ -594,7 +858,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Skills */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="lg:col-span-3 bg-white rounded-lg border border-gray-200 p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Skills</h2>
                         {isEditing && !showSkillInput && (
@@ -602,7 +866,7 @@ export default function ProfilePage() {
                                 onClick={addSkill}
                                 className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
                             >
-                                <Plus size={16} />
+                                <IconPlus size={16} />
                                 <span>Add Skill</span>
                             </button>
                         )}
@@ -651,7 +915,7 @@ export default function ProfilePage() {
                                             onClick={() => removeSkill(index)}
                                             className="ml-2 text-blue-600 hover:text-blue-800"
                                         >
-                                            <X size={14} />
+                                            <IconX size={14} />
                                         </button>
                                     )}
                                 </div>
@@ -663,7 +927,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Preferred Job Locations */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="lg:col-span-3 bg-white rounded-lg border border-gray-200 p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Preferred Job Locations</h2>
                         {isEditing && !showJobLocationInput && (
@@ -671,7 +935,7 @@ export default function ProfilePage() {
                                 onClick={addJobLocation}
                                 className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
                             >
-                                <Plus size={16} />
+                                <IconPlus size={16} />
                                 <span>Add Location</span>
                             </button>
                         )}
@@ -714,14 +978,14 @@ export default function ProfilePage() {
                         <div className="flex flex-wrap gap-2">
                             {(currentData.preferredJobLocations || []).map((location, index) => (
                                 <div key={index} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
-                                    <MapPin size={14} className="mr-1" />
+                                    <IconMapPin size={14} className="mr-1" />
                                     <span>{location}</span>
                                     {isEditing && (
                                         <button
                                             onClick={() => removeJobLocation(index)}
                                             className="ml-2 text-green-600 hover:text-green-800"
                                         >
-                                            <X size={14} />
+                                            <IconX size={14} />
                                         </button>
                                     )}
                                 </div>
@@ -733,7 +997,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Preferred Job Roles */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="lg:col-span-3 bg-white rounded-lg border border-gray-200 p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Preferred Job Roles</h2>
                         {isEditing && !showJobRoleInput && (
@@ -741,7 +1005,7 @@ export default function ProfilePage() {
                                 onClick={addJobRole}
                                 className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
                             >
-                                <Plus size={16} />
+                                <IconPlus size={16} />
                                 <span>Add Role</span>
                             </button>
                         )}
@@ -784,14 +1048,14 @@ export default function ProfilePage() {
                         <div className="flex flex-wrap gap-2">
                             {(currentData.preferredJobRoles || []).map((role, index) => (
                                 <div key={index} className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
-                                    <Briefcase size={14} className="mr-1" />
+                                    <IconBriefcase size={14} className="mr-1" />
                                     <span>{role}</span>
                                     {isEditing && (
                                         <button
                                             onClick={() => removeJobRole(index)}
                                             className="ml-2 text-purple-600 hover:text-purple-800"
                                         >
-                                            <X size={14} />
+                                            <IconX size={14} />
                                         </button>
                                     )}
                                 </div>
@@ -803,7 +1067,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Education */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="lg:col-span-3 bg-white rounded-lg border border-gray-200 p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Education</h2>
                         {isEditing && (
@@ -811,7 +1075,7 @@ export default function ProfilePage() {
                                 onClick={addEducation}
                                 className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
                             >
-                                <Plus size={16} />
+                                <IconPlus size={16} />
                                 <span>Add Education</span>
                             </button>
                         )}
@@ -822,13 +1086,13 @@ export default function ProfilePage() {
                             {(currentData.education || []).map((edu, index) => (
                                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                                     <div className="flex justify-between items-start mb-2">
-                                        <GraduationCap className="text-gray-500 mt-1" size={20} />
+                                        <IconSchool className="text-gray-500 mt-1" size={20} />
                                         {isEditing && (
                                             <button
                                                 onClick={() => removeEducation(index)}
                                                 className="text-red-600 hover:text-red-800"
                                             >
-                                                <Trash2 size={16} />
+                                                <IconTrash size={16} />
                                             </button>
                                         )}
                                     </div>
@@ -883,7 +1147,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Certifications */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="lg:col-span-3 bg-white rounded-lg border border-gray-200 p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Certifications</h2>
                         {isEditing && (
@@ -891,7 +1155,7 @@ export default function ProfilePage() {
                                 onClick={addCertification}
                                 className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
                             >
-                                <Plus size={16} />
+                                <IconPlus size={16} />
                                 <span>Add Certification</span>
                             </button>
                         )}
@@ -902,13 +1166,13 @@ export default function ProfilePage() {
                             {(currentData.certifications || []).map((cert, index) => (
                                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                                     <div className="flex justify-between items-start mb-2">
-                                        <Award className="text-gray-500 mt-1" size={20} />
+                                        <IconAward className="text-gray-500 mt-1" size={20} />
                                         {isEditing && (
                                             <button
                                                 onClick={() => removeCertification(index)}
                                                 className="text-red-600 hover:text-red-800"
                                             >
-                                                <Trash2 size={16} />
+                                                <IconTrash size={16} />
                                             </button>
                                         )}
                                     </div>
@@ -963,87 +1227,7 @@ export default function ProfilePage() {
                     )}
                 </div>
 
-                {/* Social Links */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Social Links</h2>
 
-                    <div className="space-y-4">
-                        {/* LinkedIn */}
-                        <div className="flex items-center space-x-3">
-                            <Linkedin className="text-blue-600" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">LinkedIn</p>
-                                {isEditing ? (
-                                    <input
-                                        type="url"
-                                        value={currentData.socialLinks?.linkedin || ''}
-                                        onChange={(e) => updateNestedTempData('socialLinks', 'linkedin', e.target.value)}
-                                        placeholder="https://linkedin.com/in/yourprofile"
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">
-                                        {currentData.socialLinks?.linkedin ? (
-                                            <a href={currentData.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                {currentData.socialLinks.linkedin}
-                                            </a>
-                                        ) : 'Not set'}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* GitHub */}
-                        <div className="flex items-center space-x-3">
-                            <Github className="text-gray-800" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">GitHub</p>
-                                {isEditing ? (
-                                    <input
-                                        type="url"
-                                        value={currentData.socialLinks?.github || ''}
-                                        onChange={(e) => updateNestedTempData('socialLinks', 'github', e.target.value)}
-                                        placeholder="https://github.com/yourusername"
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">
-                                        {currentData.socialLinks?.github ? (
-                                            <a href={currentData.socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                {currentData.socialLinks.github}
-                                            </a>
-                                        ) : 'Not set'}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Website */}
-                        <div className="flex items-center space-x-3">
-                            <Globe className="text-green-600" size={20} />
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-500">Website</p>
-                                {isEditing ? (
-                                    <input
-                                        type="url"
-                                        value={currentData.socialLinks?.website || ''}
-                                        onChange={(e) => updateNestedTempData('socialLinks', 'website', e.target.value)}
-                                        placeholder="https://yourwebsite.com"
-                                        className="text-gray-800 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-full"
-                                    />
-                                ) : (
-                                    <p className="text-gray-800">
-                                        {currentData.socialLinks?.website ? (
-                                            <a href={currentData.socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                {currentData.socialLinks.website}
-                                            </a>
-                                        ) : 'Not set'}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* PDF Export Dialog */}
                 {showExportDialog && (
@@ -1052,6 +1236,7 @@ export default function ProfilePage() {
                         onClose={handleCloseExportDialog}
                     />
                 )}
+                </div>
             </div>
         </div>
     );
