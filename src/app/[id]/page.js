@@ -185,7 +185,7 @@ export default function DashboardPage() {
             };
             
             setProfileData(fallbackData);
-            setProfileCompletion(0);
+            calculateProfileCompletion(fallbackData);
         }
     };
 
@@ -280,6 +280,19 @@ export default function DashboardPage() {
         }
 
         const percentage = Math.round((completedWeight / totalWeight) * 100);
+        console.log('📊 Profile completion calculation:', {
+            completedWeight,
+            totalWeight,
+            percentage,
+            fields: fields.map(field => ({
+                key: field.key,
+                filled: field.isArray ? 
+                    (data[field.key] && Array.isArray(data[field.key]) && data[field.key].length > 0) :
+                    (data[field.key] && data[field.key].toString().trim() !== ''),
+                weight: field.weight
+            })),
+            socialLinks: socialCount
+        });
         setProfileCompletion(Math.min(100, percentage));
     };
 

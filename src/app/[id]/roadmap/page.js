@@ -249,7 +249,7 @@ export default function RoadmapPage() {
                                     <div
                                         key={skill.id}
                                         onClick={() => handleSkillSelect(skill.id)}
-                                        className={`${getColorClasses(skill.color)} border-2 rounded-xl p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105`}
+                                        className={`${getColorClasses(skill.color)} border-2 rounded-xl p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 relative`}
                                     >
                                         <div className="flex items-start justify-between mb-4">
                                             <IconComponent className={`${getIconColor(skill.color)}`} size={32} />
@@ -281,13 +281,8 @@ export default function RoadmapPage() {
                                             </div>
                                         </div>
                                         
-                                        <div className="flex items-center justify-between">
-                                            <div className="w-full bg-gray-200 rounded-full h-2 mr-3">
-                                                <div 
-                                                    className={`h-2 rounded-full bg-gradient-to-r from-${skill.color}-400 to-${skill.color}-600`}
-                                                    style={{ width: `${skill.popularity}%` }}
-                                                ></div>
-                                            </div>
+                                        {/* Arrow positioned at bottom right corner */}
+                                        <div className="absolute bottom-4 right-4">
                                             <ArrowRight className={`${getIconColor(skill.color)} flex-shrink-0`} size={20} />
                                         </div>
                                     </div>
