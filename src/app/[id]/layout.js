@@ -130,7 +130,7 @@ export default function DashboardLayout({ children }) {
                     {/* Logout Button */}
                     <button
                         onClick={handleLogoutClick}
-                        className={`w-full flex items-center ${sidebarCollapsed ? 'px-4 justify-center' : 'px-6'} py-3 text-left text-red-600 hover:bg-red-50 transition-colors mt-4`}
+                        className={`w-full flex mt-20 items-center ${sidebarCollapsed ? 'px-4 justify-center' : 'px-6'} py-3 text-left text-red-600 hover:bg-red-50 transition-colors mt-4`}
                         title={sidebarCollapsed ? 'Logout' : ''}
                     >
                         <LogOut className={sidebarCollapsed ? '' : 'mr-3'} size={20} />

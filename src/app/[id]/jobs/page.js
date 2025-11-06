@@ -5,11 +5,11 @@ import { auth, db } from "../../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import {
-    Search, MapPin, Briefcase, Calendar, DollarSign,
-    Filter, Star, ExternalLink, Clock, Building,
-    Target, TrendingUp, Heart, ArrowRight, ChevronDown,
-    Users, Award, CheckCircle
-} from "lucide-react";
+    IconSearch, IconMapPin, IconBriefcase, IconCalendar, IconCurrencyDollar,
+    IconFilter, IconStar, IconExternalLink, IconClock, IconBuilding,
+    IconTarget, IconTrendingUp, IconHeart, IconArrowRight, IconChevronDown,
+    IconUsers, IconAward, IconCircleCheck
+} from "@tabler/icons-react";
 
 export default function JobsPage() {
     const params = useParams();
@@ -230,125 +230,295 @@ export default function JobsPage() {
     };
 
     const getMatchScore = (job) => {
-        if (!profileData) return 0;
+        if (!profileData) return { score: 0, details: {} };
         
-        let score = 0;
         const userSkills = profileData.skills || [];
         const userRoles = profileData.preferredJobRoles || [];
         const userLocations = profileData.preferredJobLocations || [];
+        const userEducation = profileData.education || [];
 
         // Skills match (40% weight)
-        const skillMatches = job.skills.filter(skill => 
+        const matchedSkills = job.skills.filter(skill => 
             userSkills.some(userSkill => 
                 userSkill.toLowerCase().includes(skill.toLowerCase()) ||
                 skill.toLowerCase().includes(userSkill.toLowerCase())
             )
-        ).length;
-        score += (skillMatches / Math.max(job.skills.length, 1)) * 40;
+        );
+        const missingSkills = job.skills.filter(skill => 
+            !userSkills.some(userSkill => 
+                userSkill.toLowerCase().includes(skill.toLowerCase()) ||
+                skill.toLowerCase().includes(userSkill.toLowerCase())
+            )
+        );
+        const skillScore = (matchedSkills.length / Math.max(job.skills.length, 1)) * 40;
 
         // Role match (35% weight)
         const roleMatch = userRoles.some(role => 
             job.title.toLowerCase().includes(role.toLowerCase())
         );
-        if (roleMatch) score += 35;
+        const roleScore = roleMatch ? 35 : 0;
 
         // Location match (25% weight)
         const locationMatch = userLocations.some(location => 
             job.location.toLowerCase().includes(location.toLowerCase()) ||
             (location.toLowerCase() === 'remote' && job.remote)
         );
-        if (locationMatch) score += 25;
+        const locationScore = locationMatch ? 25 : 0;
 
-        return Math.min(Math.round(score), 100);
+        const totalScore = Math.min(Math.round(skillScore + roleScore + locationScore), 100);
+
+        return {
+            score: totalScore,
+            details: {
+                skillsMatch: {
+                    matched: matchedSkills,
+                    missing: missingSkills,
+                    percentage: Math.round((matchedSkills.length / Math.max(job.skills.length, 1)) * 100)
+                },
+                roleMatch: roleMatch,
+                locationMatch: locationMatch,
+                breakdown: {
+                    skills: Math.round(skillScore),
+                    role: roleScore,
+                    location: locationScore
+                }
+            }
+        };
     };
 
     const JobCard = ({ job, showMatchScore = false }) => {
-        const matchScore = showMatchScore ? getMatchScore(job) : job.matchScore || 0;
+        const matchData = showMatchScore ? getMatchScore(job) : { score: job.matchScore || 0, details: {} };
         const isSaved = savedJobs.has(job.id);
+        const [showDetails, setShowDetails] = useState(null); // 'skills', 'role', 'location', or null
 
         return (
-            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-300 hover:shadow-md transition-all">
-                <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 cursor-pointer">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                {/* Compact Header */}
+                <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-sm font-semibold text-gray-900 truncate cursor-pointer">
                                 {job.title}
                             </h3>
-                            {showMatchScore && matchScore > 0 && (
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    matchScore >= 80 ? 'bg-green-100 text-green-800' :
-                                    matchScore >= 60 ? 'bg-blue-100 text-blue-800' :
+                            {showMatchScore && matchData.score > 0 && (
+                                <span className={`px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
+                                    matchData.score >= 80 ? 'bg-green-100 text-green-800' :
+                                    matchData.score >= 60 ? 'bg-blue-100 text-blue-800' :
                                     'bg-yellow-100 text-yellow-800'
                                 }`}>
-                                    {matchScore}% Match
+                                    {matchData.score}%
                                 </span>
                             )}
                         </div>
-                        <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                            <Building size={16} />
-                            <span className="font-medium">{job.company}</span>
+                        <div className="flex items-center text-xs text-gray-600 mb-2">
+                            <IconBuilding size={12} className="mr-1 flex-shrink-0" />
+                            <span className="truncate">{job.company}</span>
+                            <span className="mx-1">•</span>
+                            <IconMapPin size={12} className="flex-shrink-0" />
+                            <span className="truncate">{job.location}</span>
                         </div>
                     </div>
+                    
                     <button
                         onClick={() => toggleSaveJob(job.id)}
-                        className={`p-2 rounded-full transition-colors ${
+                        className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
                             isSaved 
-                                ? 'bg-red-100 text-red-600 hover:bg-red-200' 
+                                ? 'bg-red-100 text-red-600' 
                                 : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                         }`}
                     >
-                        <Heart size={16} fill={isSaved ? 'currentColor' : 'none'} />
+                        <IconHeart size={14} fill={isSaved ? 'currentColor' : 'none'} />
                     </button>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
-                    <div className="flex items-center">
-                        <MapPin size={14} className="mr-1" />
-                        {job.location}
-                        {job.remote && <span className="ml-1 text-green-600">(Remote)</span>}
+                {/* Compact Job Details */}
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                    <div className="text-center p-1.5 bg-gray-50 rounded">
+                        <p className="text-xs text-gray-600">Salary</p>
+                        <p className="text-xs font-medium text-gray-900 truncate">{job.salary}</p>
                     </div>
-                    <div className="flex items-center">
-                        <Briefcase size={14} className="mr-1" />
-                        {job.type}
+                    <div className="text-center p-1.5 bg-gray-50 rounded">
+                        <p className="text-xs text-gray-600">Type</p>
+                        <p className="text-xs font-medium text-gray-900">{job.type}</p>
                     </div>
-                    <div className="flex items-center">
-                        <DollarSign size={14} className="mr-1" />
-                        {job.salary}
-                    </div>
-                    <div className="flex items-center">
-                        <Clock size={14} className="mr-1" />
-                        {job.experience}
+                    <div className="text-center p-1.5 bg-gray-50 rounded">
+                        <p className="text-xs text-gray-600">Exp</p>
+                        <p className="text-xs font-medium text-gray-900">{job.experience}</p>
                     </div>
                 </div>
 
-                <p className="text-gray-700 text-sm mb-4 line-clamp-2">
-                    {job.description}
-                </p>
+                {/* Compact Match Analysis */}
+                {showMatchScore && matchData.details && (
+                    <div className="mb-3 p-2 bg-blue-50 rounded border border-blue-100">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-medium text-blue-900">Match Analysis</span>
+                            <div className="flex gap-1 text-xs">
+                                <button 
+                                    className={`px-2 py-1 rounded hover:bg-white/50 transition-colors ${matchData.details.breakdown?.skills > 0 ? 'text-green-600' : 'text-gray-500'} ${showDetails === 'skills' ? 'bg-white shadow-sm' : ''}`}
+                                    onClick={() => setShowDetails(showDetails === 'skills' ? null : 'skills')}
+                                    title="Click to see skills breakdown"
+                                >
+                                    Skill Match: {matchData.details.breakdown?.skills || 0}%
+                                </button>
+                                <button 
+                                    className={`px-2 py-1 rounded hover:bg-white/50 transition-colors ${matchData.details.roleMatch ? 'text-green-600' : 'text-gray-500'} ${showDetails === 'role' ? 'bg-white shadow-sm' : ''}`}
+                                    onClick={() => setShowDetails(showDetails === 'role' ? null : 'role')}
+                                    title="Click to see role match details"
+                                >
+                                    Role: {matchData.details.roleMatch ? 'Yes' : 'No'}
+                                </button>
+                                <button 
+                                    className={`px-2 py-1 rounded hover:bg-white/50 transition-colors ${matchData.details.locationMatch ? 'text-green-600' : 'text-gray-500'} ${showDetails === 'location' ? 'bg-white shadow-sm' : ''}`}
+                                    onClick={() => setShowDetails(showDetails === 'location' ? null : 'location')}
+                                    title="Click to see location match details"
+                                >
+                                    Location: {matchData.details.locationMatch ? 'Yes' : 'No'}
+                                </button>
+                            </div>
+                        </div>
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {job.skills.slice(0, 5).map((skill, index) => (
-                        <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
-                            {skill}
-                        </span>
-                    ))}
-                    {job.skills.length > 5 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
-                            +{job.skills.length - 5} more
-                        </span>
-                    )}
+                        {/* Detailed Information Display */}
+                        {showDetails === 'skills' && (
+                            <div className="mt-2 p-2 bg-white rounded border border-blue-200">
+                                <h4 className="text-xs font-semibold text-blue-900 mb-2">Skill Match Breakdown</h4>
+                                <div className="space-y-2">
+                                    <div>
+                                        <p className="text-xs text-green-700 font-medium">You Have ({matchData.details.skillsMatch?.matched.length || 0}):</p>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {matchData.details.skillsMatch?.matched.map((skill, index) => (
+                                                <span key={index} className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs rounded">
+                                                    {skill}
+                                                </span>
+                                            )) || <span className="text-xs text-gray-500">None</span>}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-orange-700 font-medium">Missing ({matchData.details.skillsMatch?.missing.length || 0}):</p>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {matchData.details.skillsMatch?.missing.map((skill, index) => (
+                                                <span key={index} className="px-1.5 py-0.5 bg-orange-100 text-orange-800 text-xs rounded">
+                                                    {skill}
+                                                </span>
+                                            )) || <span className="text-xs text-gray-500">None</span>}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {showDetails === 'role' && (
+                            <div className="mt-2 p-2 bg-white rounded border border-blue-200">
+                                <h4 className="text-xs font-semibold text-blue-900 mb-2">Role Match Details</h4>
+                                <div className="space-y-1">
+                                    <p className="text-xs"><span className="font-medium">Job Title:</span> {job.title}</p>
+                                    <p className="text-xs"><span className="font-medium">Your Preferred Roles:</span> {profileData?.preferredJobRoles?.join(', ') || 'None set'}</p>
+                                    <p className={`text-xs font-medium ${matchData.details.roleMatch ? 'text-green-700' : 'text-red-700'}`}>
+                                        {matchData.details.roleMatch ? 'Yes - This job matches your preferred roles' : 'No - This job doesn\'t match your preferred roles'}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {showDetails === 'location' && (
+                            <div className="mt-2 p-2 bg-white rounded border border-blue-200">
+                                <h4 className="text-xs font-semibold text-blue-900 mb-2">Location Match Details</h4>
+                                <div className="space-y-1">
+                                    <p className="text-xs"><span className="font-medium">Job Location:</span> {job.location}</p>
+                                    <p className="text-xs"><span className="font-medium">Remote Available:</span> {job.remote ? 'Yes' : 'No'}</p>
+                                    <p className="text-xs"><span className="font-medium">Your Preferred Locations:</span> {profileData?.preferredJobLocations?.join(', ') || 'None set'}</p>
+                                    <p className={`text-xs font-medium ${matchData.details.locationMatch ? 'text-green-700' : 'text-red-700'}`}>
+                                        {matchData.details.locationMatch ? 'Yes - This location matches your preferences' : 'No - This location doesn\'t match your preferences'}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Compact Skills Display */}
+                        {matchData.details.skillsMatch && showDetails !== 'skills' && (
+                            <div className="space-y-1">
+                                {matchData.details.skillsMatch.matched.length > 0 && (
+                                    <div>
+                                        <p className="text-xs text-green-700 mb-1">
+                                            ✓ Have ({matchData.details.skillsMatch.matched.length}):
+                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {matchData.details.skillsMatch.matched.slice(0, 3).map((skill, index) => (
+                                                <span key={index} className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs rounded">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                            {matchData.details.skillsMatch.matched.length > 3 && (
+                                                <span className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs rounded">
+                                                    +{matchData.details.skillsMatch.matched.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {matchData.details.skillsMatch.missing.length > 0 && (
+                                    <div>
+                                        <p className="text-xs text-orange-700 mb-1">
+                                            ⚠ Need ({matchData.details.skillsMatch.missing.length}):
+                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {matchData.details.skillsMatch.missing.slice(0, 3).map((skill, index) => (
+                                                <span key={index} className="px-1.5 py-0.5 bg-orange-100 text-orange-800 text-xs rounded">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                            {matchData.details.skillsMatch.missing.length > 3 && (
+                                                <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 text-xs rounded">
+                                                    +{matchData.details.skillsMatch.missing.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Compact Skills */}
+                <div className="mb-3">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Skills Required:</p>
+                    <div className="flex flex-wrap gap-1">
+                        {job.skills.slice(0, 4).map((skill, index) => {
+                            const isMatched = matchData.details.skillsMatch?.matched.includes(skill);
+                            return (
+                                <span 
+                                    key={index} 
+                                    className={`px-1.5 py-0.5 text-xs rounded ${
+                                        isMatched 
+                                            ? 'bg-green-100 text-green-800' 
+                                            : 'bg-gray-100 text-gray-700'
+                                    }`}
+                                >
+                                    {skill}
+                                </span>
+                            );
+                        })}
+                        {job.skills.length > 4 && (
+                            <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                                +{job.skills.length - 4}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="flex items-center text-sm text-gray-500">
-                        <Calendar size={14} className="mr-1" />
-                        Posted {new Date(job.postedDate).toLocaleDateString()}
+                {/* Compact Footer */}
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex items-center text-xs text-gray-500">
+                        <span className="mr-1">Posted:</span>
+                        {new Date(job.postedDate).toLocaleDateString()}
                     </div>
                     <button 
                         onClick={() => job.applyUrl ? window.open(job.applyUrl, '_blank') : null}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center space-x-1"
+                        className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium flex items-center space-x-1"
                     >
-                        <span>Apply Now</span>
-                        <ExternalLink size={14} />
+                        <span>Apply</span>
+                        <IconExternalLink size={12} />
                     </button>
                 </div>
             </div>
@@ -357,8 +527,8 @@ export default function JobsPage() {
 
     if (loading && jobs.length === 0) {
         return (
-            <div className="p-8 bg-gray-100 min-h-screen">
-                <div className="max-w-6xl mx-auto">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -371,81 +541,147 @@ export default function JobsPage() {
     }
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Job Opportunities</h1>
-                    <p className="text-gray-600">Discover and apply to jobs that match your skills and preferences</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            {/* Modern Header */}
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <IconBriefcase className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Job Opportunities for {getDisplayName()}
+                            </h1>
+                            <p className="text-gray-600">Discover and apply to jobs that match your skills and preferences</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                {/* Search Section */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+                {/* Compact Search Section */}
+                <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg border border-white/40 p-6 mb-6">
                     <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+                        {/* Job Search Input */}
                         <div className="flex-1">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                    <IconSearch className="text-gray-400" size={18} />
+                                </div>
                                 <input
                                     type="text"
-                                    placeholder="Job title, skills, or company"
+                                    placeholder="Job title, skills, or company..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 text-gray-900"
                                 />
                             </div>
                         </div>
+
+                        {/* Location Input */}
                         <div className="flex-1">
                             <div className="relative">
-                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                    <IconMapPin className="text-gray-400" size={18} />
+                                </div>
                                 <input
                                     type="text"
-                                    placeholder="Location or 'Remote'"
+                                    placeholder="Location or 'Remote'..."
                                     value={locationQuery}
                                     onChange={(e) => setLocationQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all duration-200 text-gray-900"
                                 />
                             </div>
                         </div>
+
+                        {/* Search Button */}
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2"
                         >
-                            Search Jobs
+                            <IconSearch size={16} />
+                            <span>Search</span>
                         </button>
                     </form>
+
+                    {/* Quick Search Tags */}
+                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
+                        <span className="text-xs text-gray-600 font-medium">Popular:</span>
+                        {['Software Engineer', 'Product Manager', 'Remote Jobs'].map((term, index) => (
+                            <button
+                                key={index}
+                                type="button"
+                                onClick={() => {
+                                    setSearchQuery(term);
+                                    handleSearch({ preventDefault: () => {} });
+                                }}
+                                className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                            >
+                                {term}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="mb-6">
-                    <div className="border-b border-gray-200">
-                        <nav className="-mb-px flex space-x-8">
+                {/* Enhanced Tabs */}
+                <div className="mb-8">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/40 p-2">
+                        <nav className="flex space-x-2">
                             <button
                                 onClick={() => setActiveTab('all')}
-                                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                                className={`relative flex-1 py-4 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
                                     activeTab === 'all'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg transform scale-105'
+                                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                             >
-                                All Jobs ({jobs.length})
+                                <div className="flex items-center justify-center space-x-2">
+                                    <IconBriefcase size={18} />
+                                    <span>All Jobs</span>
+                                    <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                        activeTab === 'all' 
+                                            ? 'bg-white/20 text-white' 
+                                            : 'bg-gray-200 text-gray-600'
+                                    }`}>
+                                        {jobs.length}
+                                    </div>
+                                </div>
+                                {activeTab === 'all' && (
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl opacity-20 blur-lg"></div>
+                                )}
                             </button>
+                            
                             <button
                                 onClick={() => setActiveTab('preferred')}
-                                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-1 ${
+                                className={`relative flex-1 py-4 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
                                     activeTab === 'preferred'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg transform scale-105'
+                                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                             >
-                                <Target size={16} />
-                                <span>Recommended ({preferredJobs.length})</span>
+                                <div className="flex items-center justify-center space-x-2">
+                                    <IconTarget size={18} />
+                                    <span>Recommended</span>
+                                    <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                        activeTab === 'preferred' 
+                                            ? 'bg-white/20 text-white' 
+                                            : 'bg-gray-200 text-gray-600'
+                                    }`}>
+                                        {preferredJobs.length}
+                                    </div>
+                                </div>
+                                {activeTab === 'preferred' && (
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl opacity-20 blur-lg"></div>
+                                )}
                             </button>
                         </nav>
                     </div>
                 </div>
 
                 {/* Job Listings */}
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {activeTab === 'all' ? (
                         jobs.length > 0 ? (
                             jobs.map((job) => (
@@ -453,7 +689,7 @@ export default function JobsPage() {
                             ))
                         ) : (
                             <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                                <Briefcase className="mx-auto text-gray-400 mb-4" size={48} />
+                                <IconBriefcase className="mx-auto text-gray-400 mb-4" size={48} />
                                 <h3 className="text-lg font-medium text-gray-800 mb-2">
                                     {searchQuery || locationQuery ? 'No Jobs Found' : 'Loading Jobs...'}
                                 </h3>
@@ -517,7 +753,7 @@ export default function JobsPage() {
                             </>
                         ) : (
                             <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                                <Target className="mx-auto text-gray-400 mb-4" size={48} />
+                                <IconTarget className="mx-auto text-gray-400 mb-4" size={48} />
                                 <h3 className="text-lg font-medium text-gray-800 mb-2">No Preferred Jobs Found</h3>
                                 <p className="text-gray-600 mb-4">
                                     {!profileData?.preferredJobRoles?.length && !profileData?.preferredJobLocations?.length

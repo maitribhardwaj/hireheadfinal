@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { db } from "../../../config/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { Play, Square, AlertCircle, Download, RotateCcw, StopCircle, X } from "lucide-react";
+import { IconPlayerPlay, IconSquare, IconAlertCircle, IconDownload, IconRotateClockwise, IconPlayerStop, IconX } from "@tabler/icons-react";
 import Webcam from "react-webcam";
 
 export default function InterviewPage() {
@@ -274,18 +274,31 @@ export default function InterviewPage() {
     };
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <div className="max-w-4xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Interview Practice</h1>
-                    <p className="text-gray-600">Practice interviews with AI feedback to improve your performance</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            {/* Modern Header */}
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <IconPlayerPlay className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Interview Practice
+                            </h1>
+                            <p className="text-gray-600">Practice interviews with AI feedback to improve your performance</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                 {/* Error Display */}
                 {error && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                         <div className="flex items-center space-x-2">
-                            <AlertCircle className="text-red-500" size={20} />
+                            <IconAlertCircle className="text-red-500" size={20} />
                             <p className="text-red-800">{error}</p>
                         </div>
                     </div>
@@ -304,14 +317,14 @@ export default function InterviewPage() {
                                     onClick={confirmStopSession}
                                     className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
                                 >
-                                    <StopCircle size={18} />
+                                    <IconPlayerStop size={18} />
                                     <span>Yes, Stop Session</span>
                                 </button>
                                 <button
                                     onClick={cancelStopSession}
                                     className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
                                 >
-                                    <X size={18} />
+                                    <IconX size={18} />
                                     <span>Cancel</span>
                                 </button>
                             </div>
@@ -320,7 +333,7 @@ export default function InterviewPage() {
                 )}
 
                 {!sessionStarted && !sessionComplete && (
-                    <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 text-center">
                         <h2 className="text-gray-900 text-2xl font-semibold mb-4">Welcome to AI Interview Practice</h2>
                         <p className="text-gray-900 mb-6">
                             This session will record your video responses to common interview questions. 
@@ -350,7 +363,7 @@ export default function InterviewPage() {
                 {sessionStarted && !sessionComplete && (
                     <>
                         {/* Session Header with Stop Button */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 mb-6">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center space-x-4">
                                     <h2 className="text-xl font-semibold text-gray-800">Interview Session Active</h2>
@@ -365,7 +378,7 @@ export default function InterviewPage() {
                                     onClick={stopSession}
                                     className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
                                 >
-                                    <StopCircle size={18} />
+                                    <IconPlayerStop size={18} />
                                     <span>Stop Session</span>
                                 </button>
                             </div>
@@ -431,7 +444,7 @@ export default function InterviewPage() {
                                             : 'bg-green-600 hover:bg-green-700 text-white'
                                     } disabled:opacity-50`}
                                 >
-                                    {isRecording ? <Square size={20} /> : <Play size={20} />}
+                                    {isRecording ? <IconSquare size={20} /> : <IconPlayerPlay size={20} />}
                                     <span>{isRecording ? 'Stop Recording' : 'Start Recording'}</span>
                                 </button>
 
@@ -440,7 +453,7 @@ export default function InterviewPage() {
                                         onClick={stopRecording}
                                         className="flex items-center space-x-2 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
                                     >
-                                        <StopCircle size={20} />
+                                        <IconPlayerStop size={20} />
                                         <span>Stop</span>
                                     </button>
                                 )}
@@ -450,7 +463,7 @@ export default function InterviewPage() {
                                         onClick={downloadVideo}
                                         className="flex items-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                     >
-                                        <Download size={20} />
+                                        <IconDownload size={20} />
                                         <span>Download Video</span>
                                     </button>
                                 )}
@@ -531,7 +544,7 @@ export default function InterviewPage() {
                                 onClick={startNewSession}
                                 className="flex items-center space-x-2 mx-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                             >
-                                <RotateCcw size={20} />
+                                <IconRotateClockwise size={20} />
                                 <span>Start New Interview</span>
                             </button>
                         </div>

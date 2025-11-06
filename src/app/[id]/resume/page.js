@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 // Firebase imports will be loaded dynamically to avoid SSR issues
 import {
-    FileText, Upload, CheckCircle, AlertCircle, 
-    BarChart3, Target, BookOpen, ArrowLeft, RefreshCw
-} from "lucide-react";
+    IconFileText, IconUpload, IconCircleCheck, IconAlertCircle, 
+    IconChartBar, IconTarget, IconBook, IconArrowLeft, IconRefresh
+} from "@tabler/icons-react";
 
 export default function ResumePage() {
     const params = useParams();
@@ -129,28 +129,38 @@ export default function ResumePage() {
     };
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <div className="max-w-4xl mx-auto">
-                {/* Header */}
-                <div className="flex items-center mb-8">
-                    <button
-                        onClick={() => router.push(`/${params.id}`)}
-                        className="mr-4 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    >
-                        <ArrowLeft size={20} />
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Resume Analysis</h1>
-                        <p className="text-gray-600">Upload and analyze your resume for ATS compatibility and optimization tips</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            {/* Modern Header */}
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div className="flex items-center space-x-4">
+                        <button
+                            onClick={() => router.push(`/${params.id}`)}
+                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                            <IconArrowLeft size={20} />
+                        </button>
+                        <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <IconFileText className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Resume Analysis
+                            </h1>
+                            <p className="text-gray-600">Upload and analyze your resume for ATS compatibility and optimization tips</p>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                 {/* Upload Section */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8 shadow-sm">
+                <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Upload Resume</h2>
                     
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                        <FileText className="mx-auto text-gray-400 mb-4" size={48} />
+                        <IconFileText className="mx-auto text-gray-400 mb-4" size={48} />
                         
                         {!file ? (
                             <>
@@ -168,7 +178,7 @@ export default function ResumePage() {
                                     htmlFor="resume-upload"
                                     className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer inline-flex items-center space-x-2"
                                 >
-                                    <Upload size={18} />
+                                    <IconUpload size={18} />
                                     <span>Choose File</span>
                                 </label>
                             </>
@@ -186,12 +196,12 @@ export default function ResumePage() {
                                     >
                                         {analyzing ? (
                                             <>
-                                                <RefreshCw className="animate-spin" size={18} />
+                                                <IconRefresh className="animate-spin" size={18} />
                                                 <span>Analyzing...</span>
                                             </>
                                         ) : (
                                             <>
-                                                <BarChart3 size={18} />
+                                                <IconChartBar size={18} />
                                                 <span>Analyze Resume</span>
                                             </>
                                         )}
@@ -210,7 +220,7 @@ export default function ResumePage() {
                     {error && (
                         <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
                             <div className="flex items-center space-x-2">
-                                <AlertCircle className="text-red-600" size={20} />
+                                <IconAlertCircle className="text-red-600" size={20} />
                                 <p className="text-red-800">{error}</p>
                             </div>
                         </div>
@@ -219,7 +229,7 @@ export default function ResumePage() {
 
                 {/* Analysis Results */}
                 {analysis && (
-                    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-semibold text-gray-800">Analysis Results</h2>
                             <div className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBgColor(analysis.atsScore)} ${getScoreColor(analysis.atsScore)}`}>
@@ -266,21 +276,21 @@ export default function ResumePage() {
                         {/* Score Breakdown */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <div className="text-center p-4 bg-blue-50 rounded-lg">
-                                <BarChart3 className="mx-auto text-blue-600 mb-2" size={24} />
+                                <IconChartBar className="mx-auto text-blue-600 mb-2" size={24} />
                                 <div className="text-sm font-medium text-blue-800">Format Score</div>
                                 <div className="text-2xl font-bold text-blue-600">
                                     {analysis.formatScore}%
                                 </div>
                             </div>
                             <div className="text-center p-4 bg-green-50 rounded-lg">
-                                <Target className="mx-auto text-green-600 mb-2" size={24} />
+                                <IconTarget className="mx-auto text-green-600 mb-2" size={24} />
                                 <div className="text-sm font-medium text-green-800">Content Score</div>
                                 <div className="text-2xl font-bold text-green-600">
                                     {analysis.contentScore}%
                                 </div>
                             </div>
                             <div className="text-center p-4 bg-purple-50 rounded-lg">
-                                <BookOpen className="mx-auto text-purple-600 mb-2" size={24} />
+                                <IconBook className="mx-auto text-purple-600 mb-2" size={24} />
                                 <div className="text-sm font-medium text-purple-800">Keyword Score</div>
                                 <div className="text-2xl font-bold text-purple-600">
                                     {analysis.keywordScore}%
@@ -293,7 +303,7 @@ export default function ResumePage() {
                             {/* Strengths */}
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                                    <CheckCircle className="text-green-600 mr-2" size={20} />
+                                    <IconCircleCheck className="text-green-600 mr-2" size={20} />
                                     Strengths
                                 </h3>
                                 <div className="space-y-2">
@@ -309,7 +319,7 @@ export default function ResumePage() {
                             {/* Improvements */}
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                                    <AlertCircle className="text-yellow-600 mr-2" size={20} />
+                                    <IconAlertCircle className="text-yellow-600 mr-2" size={20} />
                                     Improvements
                                 </h3>
                                 <div className="space-y-2">
@@ -329,14 +339,14 @@ export default function ResumePage() {
                                 <div className="flex items-center space-x-2">
                                     {analysis.storedInFirebase ? (
                                         <>
-                                            <CheckCircle className="text-green-600" size={20} />
+                                            <IconCircleCheck className="text-green-600" size={20} />
                                             <p className="text-green-800 font-medium">
                                                 Analysis saved successfully! It will appear on your dashboard.
                                             </p>
                                         </>
                                     ) : (
                                         <>
-                                            <AlertCircle className="text-red-600" size={20} />
+                                            <IconAlertCircle className="text-red-600" size={20} />
                                             <p className="text-red-800 font-medium">
                                                 Analysis completed but not saved to your profile.
                                             </p>

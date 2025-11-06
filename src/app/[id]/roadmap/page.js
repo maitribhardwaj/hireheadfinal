@@ -215,12 +215,25 @@ export default function RoadmapPage() {
     };
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Learning Roadmaps</h1>
-                    <p className="text-gray-600">Choose your learning path and follow structured roadmaps to advance your career</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            {/* Modern Header */}
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <Brain className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Learning Roadmaps for {getDisplayName()}
+                            </h1>
+                            <p className=" text-gray-600">Choose your learning path and follow structured roadmaps to advance your career</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                 {skillCategories.map((category) => (
                     <div key={category.category} className="mb-12">

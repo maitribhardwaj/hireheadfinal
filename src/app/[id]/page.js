@@ -3,11 +3,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 // Firebase imports - loaded dynamically to avoid SSR issues
 import { 
-    User, CheckCircle, AlertCircle, TrendingUp, 
-    Calendar, MapPin, Mail, Phone, Award, 
-    BookOpen, Briefcase, ExternalLink, ArrowRight,
-    FileText, BarChart3, Target
-} from "lucide-react";
+    IconUser, IconCircleCheck, IconAlertCircle, IconTrendingUp, 
+    IconCalendar, IconMapPin, IconMail, IconPhone, IconAward, 
+    IconBook, IconBriefcase, IconExternalLink, IconArrowRight,
+    IconFileText, IconChartBar, IconTarget
+} from "@tabler/icons-react";
 
 export default function DashboardPage() {
     const params = useParams();
@@ -391,8 +391,8 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="p-8 bg-gray-100 min-h-screen">
-                <div className="max-w-6xl mx-auto">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -405,68 +405,101 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <div className="max-w-6xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome {getDisplayName()}</h1>
-                    <p className="text-gray-600">Here's your career development overview</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            {/* Modern Header */}
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <IconUser className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Welcome {getDisplayName()}
+                            </h1>
+                            <p className="text-gray-600">Here's your career development overview</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                 {/* Key Metrics Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Profile Completion</p>
-                                <p className={`text-2xl font-bold ${getCompletionColor(profileCompletion)}`}>
-                                    {profileCompletion}%
-                                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className="group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                        <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-blue-100/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600 mb-1">Profile Completion</p>
+                                    <p className={`text-2xl font-bold ${getCompletionColor(profileCompletion)}`}>
+                                        {profileCompletion}%
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <IconUser className="text-white" size={20} />
+                                </div>
                             </div>
-                            <User className={`${getCompletionColor(profileCompletion)} opacity-20`} size={32} />
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">ATS Score</p>
-                                <p className={`text-2xl font-bold ${resumeData ? getATSScoreColor(resumeData.atsScore) : 'text-gray-400'}`}>
-                                    {resumeLoading ? '...' : resumeData ? `${resumeData.atsScore}%` : 'Upload Resume'}
-                                </p>
-                                {!resumeData && !resumeLoading && (
-                                    <button
-                                        onClick={() => router.push(`/${params.id}/resume`)}
-                                        className="text-xs text-blue-600 hover:underline mt-1"
-                                    >
-                                        Upload now
-                                    </button>
-                                )}
+                    <div className="group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                        <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-emerald-100/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600 mb-1">ATS Score</p>
+                                    <p className={`text-2xl font-bold ${resumeData ? getATSScoreColor(resumeData.atsScore) : 'text-gray-400'}`}>
+                                        {resumeLoading ? '...' : resumeData ? `${resumeData.atsScore}%` : 'No Resume'}
+                                    </p>
+                                    {!resumeData && !resumeLoading && (
+                                        <button
+                                            onClick={() => router.push(`/${params.id}/resume`)}
+                                            className="text-xs text-emerald-600 hover:underline mt-1"
+                                        >
+                                            Upload now
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <IconFileText className="text-white" size={20} />
+                                </div>
                             </div>
-                            <FileText className={`${resumeData ? getATSScoreColor(resumeData.atsScore) : 'text-gray-400'} opacity-20`} size={32} />
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Job Matches</p>
-                                <p className="text-2xl font-bold text-blue-600">
-                                    {jobRecommendations.length}
-                                </p>
+                    <div className="group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                        <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-purple-100/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600 mb-1">Job Matches</p>
+                                    <p className="text-2xl font-bold text-purple-600">
+                                        {jobRecommendations.length}
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <IconBriefcase className="text-white" size={20} />
+                                </div>
                             </div>
-                            <Briefcase className="text-blue-600 opacity-20" size={32} />
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Skills Listed</p>
-                                <p className="text-2xl font-bold text-green-600">
-                                    {profileData?.skills?.length || 0}
-                                </p>
+                    <div className="group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-amber-500/10 rounded-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                        <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-orange-100/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600 mb-1">Skills Listed</p>
+                                    <p className="text-2xl font-bold text-orange-600">
+                                        {profileData?.skills?.length || 0}
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <IconTarget className="text-white" size={20} />
+                                </div>
                             </div>
-                            <Target className="text-green-600 opacity-20" size={32} />
                         </div>
                     </div>
                 </div>
@@ -477,8 +510,7 @@ export default function DashboardPage() {
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Profile Completion Card */}
-                        <div></div>
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800">Profile Completion</h2>
                                 <div className={`px-3 py-1 rounded-full text-sm font-medium ${getCompletionBgColor(profileCompletion)} ${getCompletionColor(profileCompletion)}`}>
@@ -506,42 +538,42 @@ export default function DashboardPage() {
                             {/* Profile Stats */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                                 <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                    <User className="mx-auto text-blue-600 mb-1" size={20} />
+                                    <IconUser className="mx-auto text-blue-600 mb-1" size={20} />
                                     <div className="text-sm font-medium text-blue-800">Basic Info</div>
                                     <div className="text-xs text-blue-600">
                                         {profileData?.displayName && profileData?.email && profileData?.phone ? 'Complete' : 'Incomplete'}
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                                    <BookOpen className="mx-auto text-green-600 mb-1" size={20} />
+                                    <IconBook className="mx-auto text-green-600 mb-1" size={20} />
                                     <div className="text-sm font-medium text-green-800">Skills</div>
                                     <div className="text-xs text-green-600">
                                         {profileData?.skills?.length || 0} added
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                    <Award className="mx-auto text-purple-600 mb-1" size={20} />
+                                    <IconAward className="mx-auto text-purple-600 mb-1" size={20} />
                                     <div className="text-sm font-medium text-purple-800">Education</div>
                                     <div className="text-xs text-purple-600">
                                         {profileData?.education?.length || 0} entries
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-orange-50 rounded-lg">
-                                    <Briefcase className="mx-auto text-orange-600 mb-1" size={20} />
+                                    <IconBriefcase className="mx-auto text-orange-600 mb-1" size={20} />
                                     <div className="text-sm font-medium text-orange-800">Certificates</div>
                                     <div className="text-xs text-orange-600">
                                         {profileData?.certifications?.length || 0} earned
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-teal-50 rounded-lg">
-                                    <MapPin className="mx-auto text-teal-600 mb-1" size={20} />
+                                    <IconMapPin className="mx-auto text-teal-600 mb-1" size={20} />
                                     <div className="text-sm font-medium text-teal-800">Job Locations</div>
                                     <div className="text-xs text-teal-600">
                                         {profileData?.preferredJobLocations?.length || 0} preferred
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-indigo-50 rounded-lg">
-                                    <Target className="mx-auto text-indigo-600 mb-1" size={20} />
+                                    <IconTarget className="mx-auto text-indigo-600 mb-1" size={20} />
                                     <div className="text-sm font-medium text-indigo-800">Job Roles</div>
                                     <div className="text-xs text-indigo-600">
                                         {profileData?.preferredJobRoles?.length || 0} preferred
@@ -553,7 +585,7 @@ export default function DashboardPage() {
                             {profileCompletion < 100 && (
                                 <div className="border-t border-gray-200 pt-4">
                                     <h3 className="font-medium text-gray-800 mb-3 flex items-center">
-                                        <AlertCircle className="mr-2 text-yellow-500" size={16} />
+                                        <IconAlertCircle className="mr-2 text-yellow-500" size={16} />
                                         Complete Your Profile
                                     </h3>
                                     <div className="space-y-2">
@@ -574,7 +606,7 @@ export default function DashboardPage() {
                                         className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
                                     >
                                         <span>Complete Profile</span>
-                                        <ArrowRight size={16} />
+                                        <IconArrowRight size={16} />
                                     </button>
                                 </div>
                             )}
@@ -583,7 +615,7 @@ export default function DashboardPage() {
                             {profileCompletion === 100 && (
                                 <div className="border-t border-gray-200 pt-4">
                                     <div className="flex items-center text-green-600 mb-2">
-                                        <CheckCircle className="mr-2" size={16} />
+                                        <IconCircleCheck className="mr-2" size={16} />
                                         <span className="font-medium">Profile Complete!</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-3">
@@ -594,17 +626,17 @@ export default function DashboardPage() {
                                         className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
                                     >
                                         <span>View Profile</span>
-                                        <ExternalLink size={16} />
+                                        <IconExternalLink size={16} />
                                     </button>
                                 </div>
                             )}
                         </div>
 
                         {/* ATS Resume Score Card */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                                    <FileText className="mr-2" size={20} />
+                                    <IconFileText className="mr-2" size={20} />
                                     Resume ATS Score
                                     {resumeLoading && (
                                         <div className="ml-2 animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
@@ -673,21 +705,21 @@ export default function DashboardPage() {
                                     {/* Score Breakdown */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                         <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                            <BarChart3 className="mx-auto text-blue-600 mb-1" size={20} />
+                                            <IconChartBar className="mx-auto text-blue-600 mb-1" size={20} />
                                             <div className="text-sm font-medium text-blue-800">Format</div>
                                             <div className="text-lg font-bold text-blue-600">
                                                 {resumeData.formatScore || 0}%
                                             </div>
                                         </div>
                                         <div className="text-center p-3 bg-green-50 rounded-lg">
-                                            <Target className="mx-auto text-green-600 mb-1" size={20} />
+                                            <IconTarget className="mx-auto text-green-600 mb-1" size={20} />
                                             <div className="text-sm font-medium text-green-800">Content</div>
                                             <div className="text-lg font-bold text-green-600">
                                                 {resumeData.contentScore || 0}%
                                             </div>
                                         </div>
                                         <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                            <BookOpen className="mx-auto text-purple-600 mb-1" size={20} />
+                                            <IconBook className="mx-auto text-purple-600 mb-1" size={20} />
                                             <div className="text-sm font-medium text-purple-800">Keywords</div>
                                             <div className="text-lg font-bold text-purple-600">
                                                 {resumeData.keywordScore || 0}%
@@ -737,7 +769,7 @@ export default function DashboardPage() {
                                                 <div className="space-y-1">
                                                     {resumeData.strengths.slice(0, 2).map((strength, index) => (
                                                         <div key={index} className="flex items-center text-sm text-green-600">
-                                                            <CheckCircle size={12} className="mr-2" />
+                                                            <IconCircleCheck size={12} className="mr-2" />
                                                             {strength}
                                                         </div>
                                                     ))}
@@ -752,7 +784,7 @@ export default function DashboardPage() {
                                                 className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
                                             >
                                                 <span>View Full Analysis</span>
-                                                <ArrowRight size={16} />
+                                                <IconArrowRight size={16} />
                                             </button>
                                             <button
                                                 onClick={() => router.push(`/${params.id}/resume`)}
@@ -780,7 +812,7 @@ export default function DashboardPage() {
                                         </svg>
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <div className="text-center">
-                                                <FileText className="mx-auto text-gray-400 mb-2" size={24} />
+                                                <IconFileText className="mx-auto text-gray-400 mb-2" size={24} />
                                                 <div className="text-lg font-bold text-gray-400">0%</div>
                                                 <div className="text-xs text-gray-400">No Score</div>
                                             </div>
@@ -794,7 +826,7 @@ export default function DashboardPage() {
                                         onClick={() => router.push(`/${params.id}/resume`)}
                                         className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 mx-auto"
                                     >
-                                        <FileText size={18} />
+                                        <IconFileText size={18} />
                                         <span>Upload Resume</span>
                                     </button>
                                 </div>
@@ -802,10 +834,10 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Job Recommendations Card */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                                    <Briefcase className="mr-2" size={20} />
+                                    <IconBriefcase className="mr-2" size={20} />
                                     Job Recommendations
                                 </h2>
                                 {profileData?.preferredJobRoles?.length > 0 || profileData?.preferredJobLocations?.length > 0 ? (
@@ -835,7 +867,7 @@ export default function DashboardPage() {
                                             {profileData.preferredJobRoles?.length > 0 ? (
                                                 profileData.preferredJobRoles.map((role, index) => (
                                                     <span key={`role-${index}`} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                        <Briefcase size={12} className="mr-1" />
+                                                        <IconBriefcase size={12} className="mr-1" />
                                                         {role}
                                                     </span>
                                                 ))
@@ -845,7 +877,7 @@ export default function DashboardPage() {
                                             {profileData.preferredJobLocations?.length > 0 ? (
                                                 profileData.preferredJobLocations.map((location, index) => (
                                                     <span key={`location-${index}`} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        <MapPin size={12} className="mr-1" />
+                                                        <IconMapPin size={12} className="mr-1" />
                                                         {location}
                                                     </span>
                                                 ))
@@ -867,27 +899,34 @@ export default function DashboardPage() {
                                                         <p className="text-gray-600 text-sm">{job.company}</p>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                            job.matchScore >= 90 ? 'bg-green-100 text-green-800' :
-                                                            job.matchScore >= 80 ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-yellow-100 text-yellow-800'
-                                                        }`}>
+                                                        <button 
+                                                            className={`px-2 py-1 rounded-full text-xs font-medium hover:shadow-md transition-all ${
+                                                                job.matchScore >= 90 ? 'bg-green-100 text-green-800 hover:bg-green-200' :
+                                                                job.matchScore >= 80 ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+                                                                'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                                            }`}
+                                                            onClick={() => {
+                                                                const matchInfo = `Match Score: ${job.matchScore}%\n\nThis score is based on:\n• Your skills and experience\n• Job requirements alignment\n• Location preferences\n• Role preferences\n\nClick "View All Jobs" for detailed match analysis.`;
+                                                                alert(matchInfo);
+                                                            }}
+                                                            title="Click to see how this match score is calculated"
+                                                        >
                                                             {job.matchScore}% Match
-                                                        </div>
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 
                                                 <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
                                                     <div className="flex items-center">
-                                                        <MapPin size={14} className="mr-1" />
+                                                        <IconMapPin size={14} className="mr-1" />
                                                         {job.location}
                                                     </div>
                                                     <div className="flex items-center">
-                                                        <Briefcase size={14} className="mr-1" />
+                                                        <IconBriefcase size={14} className="mr-1" />
                                                         {job.type}
                                                     </div>
                                                     <div className="flex items-center">
-                                                        <Calendar size={14} className="mr-1" />
+                                                        <span className="text-gray-500 text-xs mr-1">Posted:</span>
                                                         {new Date(job.postedDate).toLocaleDateString()}
                                                     </div>
                                                 </div>
@@ -923,7 +962,7 @@ export default function DashboardPage() {
 
                                     {jobRecommendations.length === 0 && (
                                         <div className="text-center py-8">
-                                            <Briefcase className="mx-auto text-gray-400 mb-4" size={48} />
+                                            <IconBriefcase className="mx-auto text-gray-400 mb-4" size={48} />
                                             <h3 className="text-lg font-medium text-gray-800 mb-2">No Matching Jobs Found</h3>
                                             <p className="text-gray-600 mb-4">
                                                 We couldn't find jobs matching your exact preferences. Try updating your preferred roles or locations.
@@ -943,14 +982,14 @@ export default function DashboardPage() {
                                             className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
                                         >
                                             <span>View All Jobs</span>
-                                            <ArrowRight size={16} />
+                                            <IconArrowRight size={16} />
                                         </button>
                                     </div>
                                 </>
                             ) : (
                                 /* No Preferences Set */
                                 <div className="text-center py-8">
-                                    <Target className="mx-auto text-gray-400 mb-4" size={48} />
+                                    <IconTarget className="mx-auto text-gray-400 mb-4" size={48} />
                                     <h3 className="text-lg font-medium text-gray-800 mb-2">Set Your Job Preferences</h3>
                                     <p className="text-gray-600 mb-6">
                                         Add your preferred job roles and locations to get personalized job recommendations.
@@ -960,14 +999,14 @@ export default function DashboardPage() {
                                             onClick={() => router.push(`/${params.id}/profile`)}
                                             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
                                         >
-                                            <Target size={18} />
+                                            <IconTarget size={18} />
                                             <span>Set Preferences</span>
                                         </button>
                                         <button
                                             onClick={() => router.push(`/${params.id}/jobs`)}
                                             className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
                                         >
-                                            <Briefcase size={18} />
+                                            <IconBriefcase size={18} />
                                             <span>Browse All Jobs</span>
                                         </button>
                                     </div>
@@ -979,30 +1018,30 @@ export default function DashboardPage() {
                     {/* Quick Actions */}
                     <div className="space-y-6">
                         {/* Profile Summary */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6">
                             <h3 className="font-semibold text-gray-800 mb-4">Quick Profile</h3>
                             <div className="space-y-3">
                                 <div className="flex items-center space-x-3">
-                                    <Mail className="text-gray-400" size={16} />
+                                    <IconMail className="text-gray-400" size={16} />
                                     <span className="text-sm text-gray-600">
                                         {profileData?.email || user?.email || 'No email'}
                                     </span>
                                 </div>
                                 {profileData?.phone && (
                                     <div className="flex items-center space-x-3">
-                                        <Phone className="text-gray-400" size={16} />
+                                        <IconPhone className="text-gray-400" size={16} />
                                         <span className="text-sm text-gray-600">{profileData.phone}</span>
                                     </div>
                                 )}
                                 {profileData?.location && (
                                     <div className="flex items-center space-x-3">
-                                        <MapPin className="text-gray-400" size={16} />
+                                        <IconMapPin className="text-gray-400" size={16} />
                                         <span className="text-sm text-gray-600">{profileData.location}</span>
                                     </div>
                                 )}
                                 {profileData?.updatedAt && (
                                     <div className="flex items-center space-x-3">
-                                        <Calendar className="text-gray-400" size={16} />
+                                        <IconCalendar className="text-gray-400" size={16} />
                                         <span className="text-sm text-gray-600">
                                             Updated {new Date(profileData.updatedAt).toLocaleDateString()}
                                         </span>
@@ -1012,37 +1051,37 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6">
                             <h3 className="font-semibold text-gray-800 mb-4">Quick Actions</h3>
                             <div className="space-y-3">
                                 <button
                                     onClick={() => router.push(`/${params.id}/jobs`)}
                                     className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
                                 >
-                                    <Briefcase size={18} />
+                                    <IconBriefcase size={18} />
                                     <span>Browse Jobs</span>
                                 </button>
                                 <button
                                     onClick={() => router.push(`/${params.id}/profile`)}
                                     className="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
                                 >
-                                    <User size={18} />
+                                    <IconUser size={18} />
                                     <span>Edit Profile</span>
                                 </button>
                                 <button
                                     onClick={() => router.push(`/${params.id}/resume`)}
                                     className="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
                                 >
-                                    <FileText size={18} />
+                                    <IconFileText size={18} />
                                     <span>Upload Resume</span>
                                 </button>
                             </div>
                         </div>
 
                         {/* Quick Stats */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6">
                             <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
-                                <TrendingUp className="mr-2" size={18} />
+                                <IconTrendingUp className="mr-2" size={18} />
                                 Your Progress
                             </h3>
                             <div className="space-y-4">
