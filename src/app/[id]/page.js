@@ -509,170 +509,184 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Profile Completion Card */}
-                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-semibold text-gray-800">Profile Completion</h2>
-                                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getCompletionBgColor(profileCompletion)} ${getCompletionColor(profileCompletion)}`}>
-                                    {profileCompletion}% Complete
+                        {/* Compact Profile Completion Card */}
+                        <div className="bg-gradient-to-br from-white to-blue-50/30 backdrop-blur-xl rounded-3xl shadow-xl border border-blue-100/50 p-6 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full -translate-y-12 translate-x-12"></div>
+                            <div className="relative">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                            <IconUser className="text-white" size={16} />
+                                        </div>
+                                        <h2 className="text-lg font-bold text-gray-800">Profile Completion</h2>
+                                    </div>
+                                    <div className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${getCompletionBgColor(profileCompletion)} ${getCompletionColor(profileCompletion)}`}>
+                                        {profileCompletion}%
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Progress Bar */}
-                            <div className="mb-6">
-                                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                                    <span>Profile Strength</span>
-                                    <span>{profileCompletion}%</span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-3">
-                                    <div 
-                                        className={`h-3 rounded-full transition-all duration-500 ${
-                                            profileCompletion >= 80 ? 'bg-green-500' :
-                                            profileCompletion >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                                        }`}
-                                        style={{ width: `${profileCompletion}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-
-                            {/* Profile Stats */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                    <IconUser className="mx-auto text-blue-600 mb-1" size={20} />
-                                    <div className="text-sm font-medium text-blue-800">Basic Info</div>
-                                    <div className="text-xs text-blue-600">
-                                        {profileData?.displayName && profileData?.email && profileData?.phone ? 'Complete' : 'Incomplete'}
+                                {/* Compact Progress Display */}
+                                <div className="flex items-center space-x-4">
+                                    <div className="relative w-20 h-20 flex-shrink-0">
+                                        <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
+                                            <circle
+                                                cx="50"
+                                                cy="50"
+                                                r="40"
+                                                stroke="currentColor"
+                                                strokeWidth="8"
+                                                fill="transparent"
+                                                className="text-gray-200"
+                                            />
+                                            <circle
+                                                cx="50"
+                                                cy="50"
+                                                r="40"
+                                                stroke="currentColor"
+                                                strokeWidth="8"
+                                                fill="transparent"
+                                                strokeDasharray={`${2 * Math.PI * 40}`}
+                                                strokeDashoffset={`${2 * Math.PI * 40 * (1 - profileCompletion / 100)}`}
+                                                className={`transition-all duration-1000 ${
+                                                    profileCompletion >= 80 ? 'text-green-500' :
+                                                    profileCompletion >= 50 ? 'text-yellow-500' : 'text-red-500'
+                                                }`}
+                                            />
+                                        </svg>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="text-center">
+                                                <div className={`text-xl font-bold ${getCompletionColor(profileCompletion)}`}>
+                                                    {profileCompletion}%
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="text-center p-3 bg-green-50 rounded-lg">
-                                    <IconBook className="mx-auto text-green-600 mb-1" size={20} />
-                                    <div className="text-sm font-medium text-green-800">Skills</div>
-                                    <div className="text-xs text-green-600">
-                                        {profileData?.skills?.length || 0} added
-                                    </div>
-                                </div>
-                                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                    <IconAward className="mx-auto text-purple-600 mb-1" size={20} />
-                                    <div className="text-sm font-medium text-purple-800">Education</div>
-                                    <div className="text-xs text-purple-600">
-                                        {profileData?.education?.length || 0} entries
-                                    </div>
-                                </div>
-                                <div className="text-center p-3 bg-orange-50 rounded-lg">
-                                    <IconBriefcase className="mx-auto text-orange-600 mb-1" size={20} />
-                                    <div className="text-sm font-medium text-orange-800">Certificates</div>
-                                    <div className="text-xs text-orange-600">
-                                        {profileData?.certifications?.length || 0} earned
-                                    </div>
-                                </div>
-                                <div className="text-center p-3 bg-teal-50 rounded-lg">
-                                    <IconMapPin className="mx-auto text-teal-600 mb-1" size={20} />
-                                    <div className="text-sm font-medium text-teal-800">Job Locations</div>
-                                    <div className="text-xs text-teal-600">
-                                        {profileData?.preferredJobLocations?.length || 0} preferred
-                                    </div>
-                                </div>
-                                <div className="text-center p-3 bg-indigo-50 rounded-lg">
-                                    <IconTarget className="mx-auto text-indigo-600 mb-1" size={20} />
-                                    <div className="text-sm font-medium text-indigo-800">Job Roles</div>
-                                    <div className="text-xs text-indigo-600">
-                                        {profileData?.preferredJobRoles?.length || 0} preferred
+                                    <div className="flex-1">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="text-center p-2 bg-white/60 backdrop-blur-sm rounded-lg border border-blue-100/50">
+                                                <div className="text-xs text-gray-600">Skills</div>
+                                                <div className="text-sm font-bold text-blue-600">{profileData?.skills?.length || 0}</div>
+                                            </div>
+                                            <div className="text-center p-2 bg-white/60 backdrop-blur-sm rounded-lg border border-green-100/50">
+                                                <div className="text-xs text-gray-600">Education</div>
+                                                <div className="text-sm font-bold text-green-600">{profileData?.education?.length || 0}</div>
+                                            </div>
+                                            <div className="text-center p-2 bg-white/60 backdrop-blur-sm rounded-lg border border-purple-100/50">
+                                                <div className="text-xs text-gray-600">Certificates</div>
+                                                <div className="text-sm font-bold text-purple-600">{profileData?.certifications?.length || 0}</div>
+                                            </div>
+                                            <div className="text-center p-2 bg-white/60 backdrop-blur-sm rounded-lg border border-orange-100/50">
+                                                <div className="text-xs text-gray-600">Preferences</div>
+                                                <div className="text-sm font-bold text-orange-600">{(profileData?.preferredJobRoles?.length || 0) + (profileData?.preferredJobLocations?.length || 0)}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Missing Fields */}
                             {profileCompletion < 100 && (
-                                <div className="border-t border-gray-200 pt-4">
+                                <div className="mt-6 pt-4 border-t border-gray-100">
                                     <h3 className="font-medium text-gray-800 mb-3 flex items-center">
                                         <IconAlertCircle className="mr-2 text-yellow-500" size={16} />
                                         Complete Your Profile
                                     </h3>
-                                    <div className="space-y-2">
-                                        {getMissingFields().slice(0, 3).map((field, index) => (
+                                    <div className="space-y-2 mb-4">
+                                        {getMissingFields().slice(0, 2).map((field, index) => (
                                             <div key={index} className="flex items-center text-sm text-gray-600">
                                                 <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
                                                 Add {field}
                                             </div>
                                         ))}
-                                        {getMissingFields().length > 3 && (
+                                        {getMissingFields().length > 2 && (
                                             <div className="text-sm text-gray-500">
-                                                +{getMissingFields().length - 3} more fields
+                                                +{getMissingFields().length - 2} more fields
                                             </div>
                                         )}
                                     </div>
                                     <button
                                         onClick={() => router.push(`/${params.id}/profile`)}
-                                        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                                        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
                                     >
                                         <span>Complete Profile</span>
-                                        <IconArrowRight size={16} />
+                                        <IconArrowRight size={14} />
                                     </button>
                                 </div>
                             )}
 
                             {/* Profile Complete */}
                             {profileCompletion === 100 && (
-                                <div className="border-t border-gray-200 pt-4">
+                                <div className="mt-6 pt-4 border-t border-gray-100">
                                     <div className="flex items-center text-green-600 mb-2">
                                         <IconCircleCheck className="mr-2" size={16} />
                                         <span className="font-medium">Profile Complete!</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-3">
-                                        Your profile is fully optimized for better job matching and opportunities.
+                                        Your profile is fully optimized for better job matching.
                                     </p>
                                     <button
                                         onClick={() => router.push(`/${params.id}/profile`)}
-                                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                                        className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
                                     >
                                         <span>View Profile</span>
-                                        <IconExternalLink size={16} />
+                                        <IconExternalLink size={14} />
                                     </button>
                                 </div>
                             )}
                         </div>
 
-                        {/* ATS Resume Score Card */}
-                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                                    <IconFileText className="mr-2" size={20} />
-                                    Resume ATS Score
-                                    {resumeLoading && (
-                                        <div className="ml-2 animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                    )}
-                                </h2>
-                                <div className="flex items-center space-x-2">
-                                    {resumeData && (
-                                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${getATSScoreBgColor(resumeData.atsScore)} ${getATSScoreColor(resumeData.atsScore)}`}>
-                                            {getATSScoreLabel(resumeData.atsScore)}
+
+                        {/* Enhanced ATS Resume Score Card */}
+                        <div className="bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-xl rounded-3xl shadow-xl border border-emerald-100/50 p-8 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-green-400/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div className="relative">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl flex items-center justify-center">
+                                            <IconFileText className="text-white" size={20} />
                                         </div>
-                                    )}
-                                    <button
-                                        onClick={refreshResumeData}
-                                        disabled={resumeLoading}
-                                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                                        title="Refresh resume data"
-                                    >
-                                        <svg className={`w-4 h-4 ${resumeLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                        </svg>
-                                    </button>
+                                        <div>
+                                            <h2 className="text-xl font-bold text-gray-800">Resume ATS Score</h2>
+                                            {resumeLoading && (
+                                                <div className="flex items-center mt-1">
+                                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-emerald-600 mr-2"></div>
+                                                    <span className="text-xs text-gray-500">Analyzing...</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        {resumeData && (
+                                            <div className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm ${getATSScoreBgColor(resumeData.atsScore)} ${getATSScoreColor(resumeData.atsScore)}`}>
+                                                {getATSScoreLabel(resumeData.atsScore)}
+                                            </div>
+                                        )}
+                                        <button
+                                            onClick={refreshResumeData}
+                                            disabled={resumeLoading}
+                                            className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-50"
+                                            title="Refresh resume data"
+                                        >
+                                            <svg className={`w-4 h-4 ${resumeLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             {resumeData ? (
                                 <>
-                                    {/* ATS Score Display */}
-                                    <div className="flex items-center justify-center mb-6">
-                                        <div className="relative w-32 h-32">
-                                            <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                                    {/* Enhanced ATS Score Display */}
+                                    <div className="flex items-center justify-center mb-8">
+                                        <div className="relative w-40 h-40">
+                                            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
                                                 <circle
                                                     cx="50"
                                                     cy="50"
                                                     r="40"
                                                     stroke="currentColor"
-                                                    strokeWidth="8"
+                                                    strokeWidth="6"
                                                     fill="transparent"
                                                     className="text-gray-200"
                                                 />
@@ -681,11 +695,11 @@ export default function DashboardPage() {
                                                     cy="50"
                                                     r="40"
                                                     stroke="currentColor"
-                                                    strokeWidth="8"
+                                                    strokeWidth="6"
                                                     fill="transparent"
                                                     strokeDasharray={`${2 * Math.PI * 40}`}
                                                     strokeDashoffset={`${2 * Math.PI * 40 * (1 - resumeData.atsScore / 100)}`}
-                                                    className={`transition-all duration-500 ${
+                                                    className={`transition-all duration-1000 ${
                                                         resumeData.atsScore >= 80 ? 'text-green-500' :
                                                         resumeData.atsScore >= 60 ? 'text-yellow-500' : 'text-red-500'
                                                     }`}
@@ -693,102 +707,114 @@ export default function DashboardPage() {
                                             </svg>
                                             <div className="absolute inset-0 flex items-center justify-center">
                                                 <div className="text-center">
-                                                    <div className={`text-3xl font-bold ${getATSScoreColor(resumeData.atsScore)}`}>
+                                                    <div className={`text-4xl font-bold ${getATSScoreColor(resumeData.atsScore)}`}>
                                                         {resumeData.atsScore}%
                                                     </div>
-                                                    <div className="text-xs text-gray-500">ATS Score</div>
+                                                    <div className="text-sm text-gray-500 font-medium">ATS Score</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Score Breakdown */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                            <IconChartBar className="mx-auto text-blue-600 mb-1" size={20} />
-                                            <div className="text-sm font-medium text-blue-800">Format</div>
-                                            <div className="text-lg font-bold text-blue-600">
-                                                {resumeData.formatScore || 0}%
+                                    {/* Enhanced Score Breakdown */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                        <div className="group relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 rounded-xl"></div>
+                                            <div className="relative text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-blue-100/50 hover:shadow-lg transition-all duration-300">
+                                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                                    <IconChartBar className="text-white" size={16} />
+                                                </div>
+                                                <div className="text-sm font-semibold text-gray-800">Format</div>
+                                                <div className="text-xl font-bold text-blue-600">
+                                                    {resumeData.formatScore || 0}%
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                                            <IconTarget className="mx-auto text-green-600 mb-1" size={20} />
-                                            <div className="text-sm font-medium text-green-800">Content</div>
-                                            <div className="text-lg font-bold text-green-600">
-                                                {resumeData.contentScore || 0}%
+                                        <div className="group relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 rounded-xl"></div>
+                                            <div className="relative text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-green-100/50 hover:shadow-lg transition-all duration-300">
+                                                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                                    <IconTarget className="text-white" size={16} />
+                                                </div>
+                                                <div className="text-sm font-semibold text-gray-800">Content</div>
+                                                <div className="text-xl font-bold text-green-600">
+                                                    {resumeData.contentScore || 0}%
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                            <IconBook className="mx-auto text-purple-600 mb-1" size={20} />
-                                            <div className="text-sm font-medium text-purple-800">Keywords</div>
-                                            <div className="text-lg font-bold text-purple-600">
-                                                {resumeData.keywordScore || 0}%
+                                        <div className="group relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10 rounded-xl"></div>
+                                            <div className="relative text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-purple-100/50 hover:shadow-lg transition-all duration-300">
+                                                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                                    <IconBook className="text-white" size={16} />
+                                                </div>
+                                                <div className="text-sm font-semibold text-gray-800">Keywords</div>
+                                                <div className="text-xl font-bold text-purple-600">
+                                                    {resumeData.keywordScore || 0}%
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Resume Info */}
-                                    <div className="border-t border-gray-200 pt-4">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="text-sm text-gray-600">Last Analysis</span>
-                                            <span className="text-sm font-medium text-gray-800">
-                                                {new Date(resumeData.analysisDate).toLocaleDateString()} at {new Date(resumeData.analysisDate).toLocaleTimeString()}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="text-sm text-gray-600">Resume File</span>
-                                            <span className="text-sm font-medium text-gray-800">
-                                                {resumeData.fileName || 'resume.pdf'}
-                                            </span>
-                                        </div>
-                                        {resumeData.updatedAt && (
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className="text-sm text-gray-600">Stored in Database</span>
-                                                <span className="text-sm font-medium text-green-600">
-                                                    ✓ {new Date(resumeData.updatedAt).toLocaleDateString()}
-                                                </span>
+                                    {/* Enhanced Resume Info */}
+                                    <div className="border-t border-gray-100 pt-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-100/50">
+                                                <div className="flex items-center space-x-2 mb-2">
+                                                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                        <IconCalendar className="text-blue-600" size={14} />
+                                                    </div>
+                                                    <span className="text-sm font-medium text-gray-700">Last Analysis</span>
+                                                </div>
+                                                <p className="text-sm text-gray-600">
+                                                    {new Date(resumeData.analysisDate).toLocaleDateString()}
+                                                </p>
                                             </div>
-                                        )}
-                                        {resumeData.dataSource && (
-                                            <div className="flex items-center justify-between mb-4">
-                                                <span className="text-sm text-gray-600">Analysis Type</span>
-                                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                                    resumeData.dataSource === 'Real Content Analysis' 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-blue-100 text-blue-800'
-                                                }`}>
-                                                    {resumeData.dataSource === 'Real Content Analysis' ? 'Real Analysis' : 'Demo'}
-                                                </span>
+                                            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-100/50">
+                                                <div className="flex items-center space-x-2 mb-2">
+                                                    <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                                                        <IconFileText className="text-green-600" size={14} />
+                                                    </div>
+                                                    <span className="text-sm font-medium text-gray-700">Resume File</span>
+                                                </div>
+                                                <p className="text-sm text-gray-600">
+                                                    {resumeData.fileName || 'resume.pdf'}
+                                                </p>
                                             </div>
-                                        )}
+                                        </div>
                                         
                                         {/* Top Strengths */}
                                         {resumeData.strengths && resumeData.strengths.length > 0 && (
-                                            <div className="mb-4">
-                                                <h4 className="text-sm font-medium text-gray-800 mb-2">Top Strengths</h4>
-                                                <div className="space-y-1">
+                                            <div className="mb-6">
+                                                <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+                                                    <div className="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center mr-2">
+                                                        <IconCircleCheck className="text-emerald-600" size={14} />
+                                                    </div>
+                                                    Top Strengths
+                                                </h4>
+                                                <div className="grid grid-cols-1 gap-2">
                                                     {resumeData.strengths.slice(0, 2).map((strength, index) => (
-                                                        <div key={index} className="flex items-center text-sm text-green-600">
-                                                            <IconCircleCheck size={12} className="mr-2" />
-                                                            {strength}
+                                                        <div key={index} className="flex items-center p-3 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                                                            <div className="w-2 h-2 bg-emerald-500 rounded-full mr-3"></div>
+                                                            <span className="text-sm text-emerald-700 font-medium">{strength}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Action Buttons */}
-                                        <div className="flex space-x-3">
+                                        {/* Enhanced Action Buttons */}
+                                        <div className="flex flex-col sm:flex-row gap-3">
                                             <button
                                                 onClick={() => router.push(`/${params.id}/resume`)}
-                                                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                                                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white px-6 py-3 rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 flex items-center justify-center space-x-2 font-medium shadow-lg"
                                             >
                                                 <span>View Full Analysis</span>
                                                 <IconArrowRight size={16} />
                                             </button>
                                             <button
                                                 onClick={() => router.push(`/${params.id}/resume`)}
-                                                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                                                className="bg-white/80 backdrop-blur-sm text-gray-700 px-6 py-3 rounded-xl hover:bg-white transition-all duration-200 border border-gray-200/50 font-medium"
                                             >
                                                 Upload New
                                             </button>
@@ -833,22 +859,26 @@ export default function DashboardPage() {
                             )}
                         </div>
 
-                        {/* Job Recommendations Card */}
-                        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                                    <IconBriefcase className="mr-2" size={20} />
-                                    Job Recommendations
-                                </h2>
-                                {profileData?.preferredJobRoles?.length > 0 || profileData?.preferredJobLocations?.length > 0 ? (
-                                    <div className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                        {jobRecommendations.length} Matches
+                        {/* Enhanced Job Recommendations Card */}
+                        <div className="bg-gradient-to-br from-white to-purple-50/30 backdrop-blur-xl rounded-3xl shadow-xl border border-purple-100/50 p-8 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div className="relative">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                                            <IconBriefcase className="text-white" size={20} />
+                                        </div>
+                                        <h2 className="text-xl font-bold text-gray-800">Job Recommendations</h2>
                                     </div>
-                                ) : (
-                                    <div className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600">
-                                        General
-                                    </div>
-                                )}
+                                    {profileData?.preferredJobRoles?.length > 0 || profileData?.preferredJobLocations?.length > 0 ? (
+                                        <div className="px-4 py-2 rounded-full text-sm font-bold bg-purple-100 text-purple-800 shadow-sm">
+                                            {jobRecommendations.length} Matches
+                                        </div>
+                                    ) : (
+                                        <div className="px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600 shadow-sm">
+                                            General
+                                        </div>
+                                    )}
                             </div>
 
                             {profileData?.preferredJobRoles?.length > 0 || profileData?.preferredJobLocations?.length > 0 ? (
@@ -1012,10 +1042,11 @@ export default function DashboardPage() {
                                     </div>
                                 </div>
                             )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Quick Actions */}
+                    {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Profile Summary */}
                         <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6">

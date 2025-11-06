@@ -1,7 +1,7 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import { 
-    Code, Database, Smartphone, Brain, Shield, Cloud, 
+    Code, Database, Smartphone, Shield, Cloud, 
     Palette, BarChart3, Cpu, Globe, ArrowRight, Star,
     TrendingUp, Users, Zap
 } from "lucide-react";
@@ -86,7 +86,7 @@ export default function RoadmapPage() {
                     id: "machine-learning",
                     name: "Machine Learning",
                     description: "Build intelligent systems and predictive models",
-                    icon: Brain,
+                    icon: BarChart3,
                     difficulty: "Advanced",
                     duration: "12-18 months",
                     popularity: 87,
@@ -221,7 +221,7 @@ export default function RoadmapPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
                     <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-                            <Brain className="text-white" size={24} />
+                            <Code className="text-white" size={24} />
                         </div>
                         <div>
                             <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
