@@ -58,14 +58,24 @@ export default function RoadmapPage() {
                     color: "purple"
                 },
                 {
-                    id: "mobile",
-                    name: "Mobile Development",
-                    description: "iOS and Android app development with React Native or Flutter",
+                    id: "ios",
+                    name: "iOS Development",
+                    description: "Build native iOS apps using Swift, SwiftUI, and Xcode development tools",
                     icon: Smartphone,
                     difficulty: "Intermediate",
-                    duration: "6-9 months",
-                    popularity: 85,
+                    duration: "6-8 months",
+                    popularity: 82,
                     color: "indigo"
+                },
+                {
+                    id: "android",
+                    name: "Android Development",
+                    description: "Create Android apps with Kotlin, Java, and Android Studio",
+                    icon: Smartphone,
+                    difficulty: "Intermediate",
+                    duration: "6-8 months",
+                    popularity: 88,
+                    color: "emerald"
                 }
             ]
         },
@@ -73,8 +83,8 @@ export default function RoadmapPage() {
             category: "Data & AI",
             skills: [
                 {
-                    id: "data-science",
-                    name: "Data Science",
+                    id: "ai-and-data-science",
+                    name: "AI and Data Science",
                     description: "Analyze data, build models, and extract insights using Python/R",
                     icon: BarChart3,
                     difficulty: "Advanced",
@@ -151,16 +161,6 @@ export default function RoadmapPage() {
                     duration: "6-10 months",
                     popularity: 83,
                     color: "yellow"
-                },
-                {
-                    id: "digital-marketing",
-                    name: "Digital Marketing",
-                    description: "Online marketing, SEO, social media, and analytics",
-                    icon: TrendingUp,
-                    difficulty: "Beginner",
-                    duration: "3-6 months",
-                    popularity: 81,
-                    color: "emerald"
                 }
             ]
         }
@@ -211,7 +211,29 @@ export default function RoadmapPage() {
     };
 
     const handleSkillSelect = (skillId) => {
-        router.push(`/${params.id}/roadmap/${skillId}`);
+        // Map skill IDs to roadmap.sh URLs
+        const roadmapUrls = {
+            'frontend': 'https://roadmap.sh/frontend',
+            'backend': 'https://roadmap.sh/backend',
+            'fullstack': 'https://roadmap.sh/full-stack',
+            'ios': 'https://roadmap.sh/ios',
+            'android': 'https://roadmap.sh/android',
+            'ai-and-data-science': 'https://roadmap.sh/ai-data-scientist',
+            'machine-learning': 'https://roadmap.sh/machine-learning',
+            'ai-engineering': 'https://roadmap.sh/ai-engineer',
+            'devops': 'https://roadmap.sh/devops',
+            'cybersecurity': 'https://roadmap.sh/cyber-security',
+            'ui-ux': 'https://roadmap.sh/ux-design',
+            'product-management': 'https://roadmap.sh/product-manager',
+        };
+
+        const roadmapUrl = roadmapUrls[skillId];
+        if (roadmapUrl) {
+            // Open roadmap.sh in a new tab
+            window.open(roadmapUrl, '_blank');
+        } else {
+            console.warn(`No roadmap URL found for skill: ${skillId}`);
+        }
     };
 
     return (
@@ -296,20 +318,20 @@ export default function RoadmapPage() {
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mt-16">
                     <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
                     <p className="text-xl mb-6 opacity-90">
-                        Choose any skill above to begin your personalized learning roadmap with step-by-step guidance.
+                        Choose any skill above to access the official roadmap.sh learning paths with comprehensive guidance.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                         <div className="bg-white/20 rounded-lg px-4 py-2">
-                            <span className="font-semibold">✨ Interactive Learning</span>
+                            <span className="font-semibold">🔗 Official roadmap.sh</span>
                         </div>
                         <div className="bg-white/20 rounded-lg px-4 py-2">
-                            <span className="font-semibold">🎯 Project-Based</span>
+                            <span className="font-semibold">🎯 Interactive Roadmaps</span>
                         </div>
                         <div className="bg-white/20 rounded-lg px-4 py-2">
-                            <span className="font-semibold">📈 Progress Tracking</span>
+                            <span className="font-semibold">📈 Community Driven</span>
                         </div>
                         <div className="bg-white/20 rounded-lg px-4 py-2">
-                            <span className="font-semibold">🏆 Certificates</span>
+                            <span className="font-semibold">🆓 Free Resources</span>
                         </div>
                     </div>
                 </div>

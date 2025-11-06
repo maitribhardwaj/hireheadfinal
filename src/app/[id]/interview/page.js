@@ -16,6 +16,12 @@ export default function InterviewPage() {
     const [analysis, setAnalysis] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [isCameraReady, setIsCameraReady] = useState(false);
+    const [cameraError, setCameraError] = useState(null);
+    const [permissionGranted, setPermissionGranted] = useState(false);
+    const [requestingPermission, setRequestingPermission] = useState(false);
+    const [isTranscribing, setIsTranscribing] = useState(false);
+    const [interimTranscript, setInterimTranscript] = useState("");
+    const [speechSupported, setSpeechSupported] = useState(false);
     const [recordedChunks, setRecordedChunks] = useState([]);
     const [videoBlob, setVideoBlob] = useState(null);
     const [error, setError] = useState(null);
@@ -37,6 +43,198 @@ export default function InterviewPage() {
         height: 720,
         facingMode: "user"
     };
+
+    // Request camera permission explicitly
+    const requestCameraPermission = async () => {
+        try {
+            setRequestingPermission(true);
+            setCameraError(null);
+            setError(null);
+            
+            // Check if getUserMedia is supported
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Camera access is not supported in this browser');
+            }
+            
+            console.log('Requesting camera permission...');
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: videoConstraints, 
+                audio: true 
+            });
+            
+            console.log('Camera permission granted');
+            
+            // Permission granted, stop the stream as webcam component will handle it
+            stream.getTracks().forEach(track => track.stop());
+            setPermissionGranted(true);
+            setIsCameraReady(true);
+            
+            return true;
+            
+        } catch (err) {
+            console.error('Camera permission error:', err);
+            let errorMessage = 'Camera access denied. ';
+            
+            if (err.name === 'NotAllowedError') {
+                errorMessage += 'Please click "Allow" when your browser asks for camera permission, then try again.';
+            } else if (err.name === 'NotFoundError') {
+                errorMessage += 'No camera found. Please connect a camera and try again.';
+            } else if (err.name === 'NotReadableError') {
+                errorMessage += 'Camera is being used by another application. Please close other apps using the camera.';
+            } else if (err.name === 'OverconstrainedError') {
+                errorMessage += 'Camera does not support the required settings.';
+            } else {
+                errorMessage += err.message;
+            }
+            
+            setCameraError(errorMessage);
+            setError(errorMessage);
+            setPermissionGranted(false);
+            setIsCameraReady(false);
+            
+            return false;
+        } finally {
+            setRequestingPermission(false);
+        }
+    };
+
+    // Speech Recognition Functions
+    const startSpeechRecognition = () => {
+        try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                console.log('Speech recognition not supported in this browser');
+                setSpeechSupported(false);
+                return;
+            }
+
+            setSpeechSupported(true);
+            const recognition = new SpeechRecognition();
+            
+            // Configure recognition settings
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "en-US";
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                console.log('Speech recognition started');
+                setIsTranscribing(true);
+            };
+
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // Update interim transcript for live display
+                setInterimTranscript(interimTranscript);
+
+                // Add final transcript to the main transcript
+                if (finalTranscript) {
+                    setTranscript(prev => {
+                        const newTranscript = prev + finalTranscript;
+                        console.log('New transcript:', newTranscript);
+                        return newTranscript;
+                    });
+                    setInterimTranscript(''); // Clear interim when we have final
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                setIsTranscribing(false);
+                
+                if (event.error === 'no-speech') {
+                    console.log('No speech detected, continuing...');
+                    // Don't show error for no-speech, just continue
+                } else if (event.error === 'network') {
+                    setError('Network error during speech recognition. Please check your connection.');
+                } else if (event.error === 'not-allowed') {
+                    setError('Microphone access denied. Please allow microphone access for transcription.');
+                } else {
+                    setError(`Speech recognition error: ${event.error}`);
+                }
+            };
+
+            recognition.onend = () => {
+                console.log('Speech recognition ended');
+                setIsTranscribing(false);
+                setInterimTranscript('');
+                
+                // Restart recognition if still recording
+                if (isRecording) {
+                    console.log('Restarting speech recognition...');
+                    setTimeout(() => {
+                        if (isRecording && recognitionRef.current) {
+                            recognition.start();
+                        }
+                    }, 100);
+                }
+            };
+
+            recognition.start();
+            recognitionRef.current = recognition;
+            
+        } catch (err) {
+            console.error('Failed to start speech recognition:', err);
+            setError('Failed to start speech recognition: ' + err.message);
+            setSpeechSupported(false);
+        }
+    };
+
+    const stopSpeechRecognition = () => {
+        if (recognitionRef.current) {
+            console.log('Stopping speech recognition');
+            recognitionRef.current.stop();
+            recognitionRef.current = null;
+            setIsTranscribing(false);
+            setInterimTranscript('');
+        }
+    };
+
+    // Check camera permission and speech support on component mount
+    useEffect(() => {
+        const checkPermissionsAndSupport = async () => {
+            // Check camera permission
+            try {
+                const permission = await navigator.permissions.query({ name: 'camera' });
+                
+                if (permission.state === 'granted') {
+                    console.log('Camera permission already granted');
+                    setPermissionGranted(true);
+                } else if (permission.state === 'prompt') {
+                    console.log('Camera permission needs to be requested');
+                } else {
+                    console.log('Camera permission denied');
+                    setCameraError('Camera permission was previously denied. Please enable it in your browser settings.');
+                }
+            } catch (err) {
+                console.log('Permission API not supported, will request permission when needed');
+            }
+
+            // Check speech recognition support
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            setSpeechSupported(!!SpeechRecognition);
+            
+            if (!SpeechRecognition) {
+                console.log('Speech recognition not supported in this browser');
+            }
+        };
+
+        checkPermissionsAndSupport();
+    }, []);
 
     const getDisplayName = () => {
         if (params.id) {
@@ -61,8 +259,13 @@ export default function InterviewPage() {
     );
 
     const startRecording = useCallback(() => {
+        if (!permissionGranted) {
+            setError("Camera permission not granted. Please enable camera access first.");
+            return;
+        }
+
         if (!webcamRef.current || !webcamRef.current.stream) {
-            setError("Camera not ready. Please ensure camera access is granted.");
+            setError("Camera not ready. Please wait for camera to initialize or refresh the page.");
             return;
         }
 
@@ -71,74 +274,70 @@ export default function InterviewPage() {
         
         try {
             const stream = webcamRef.current.stream;
+            
+            // Check if stream is active
+            if (!stream.active) {
+                setError("Camera stream is not active. Please refresh the page and try again.");
+                return;
+            }
+            
+            // Try different MIME types for better compatibility
+            let mimeType = "video/webm";
+            if (!MediaRecorder.isTypeSupported("video/webm")) {
+                if (MediaRecorder.isTypeSupported("video/mp4")) {
+                    mimeType = "video/mp4";
+                } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
+                    mimeType = "video/webm;codecs=vp8";
+                } else {
+                    mimeType = ""; // Let browser choose
+                }
+            }
+            
             const mediaRecorder = new MediaRecorder(stream, {
-                mimeType: "video/webm"
+                mimeType: mimeType
             });
             
             mediaRecorderRef.current = mediaRecorder;
             mediaRecorder.addEventListener("dataavailable", handleDataAvailable);
-            mediaRecorder.start();
-            setIsRecording(true);
             
-            // Start speech recognition
-            startSpeechRecognition();
+            mediaRecorder.addEventListener("start", () => {
+                console.log("Recording started");
+                setIsRecording(true);
+            });
+            
+            mediaRecorder.addEventListener("error", (event) => {
+                console.error("MediaRecorder error:", event.error);
+                setError("Recording error: " + event.error.message);
+                setIsRecording(false);
+            });
+            
+            mediaRecorder.start(1000); // Collect data every second
+            
+            // Start speech recognition for live transcription
+            if (speechSupported) {
+                startSpeechRecognition();
+            } else {
+                console.log('Speech recognition not supported, recording without transcription');
+            }
             
         } catch (err) {
+            console.error("Failed to start recording:", err);
             setError("Failed to start recording: " + err.message);
         }
-    }, [webcamRef, handleDataAvailable]);
+    }, [webcamRef, handleDataAvailable, permissionGranted]);
 
     const stopRecording = useCallback(() => {
         if (mediaRecorderRef.current && isRecording) {
+            console.log('Stopping recording...');
             mediaRecorderRef.current.stop();
             setIsRecording(false);
             
             // Stop speech recognition
-            if (recognitionRef.current) {
-                recognitionRef.current.stop();
-            }
+            stopSpeechRecognition();
         }
     }, [mediaRecorderRef, isRecording]);
 
-    const startSpeechRecognition = () => {
-        try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (!SpeechRecognition) {
-                console.log('Speech recognition not supported');
-                return;
-            }
 
-            const recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = "en-US";
-
-            recognition.onresult = (event) => {
-                let finalTranscript = '';
-                
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript + ' ';
-                    }
-                }
-
-                if (finalTranscript) {
-                    setTranscript(prev => prev + finalTranscript);
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-            };
-
-            recognition.start();
-            recognitionRef.current = recognition;
-        } catch (err) {
-            console.error('Failed to start speech recognition:', err);
-        }
-    };
 
     useEffect(() => {
         if (recordedChunks.length > 0 && !isRecording) {
@@ -351,12 +550,73 @@ export default function InterviewPage() {
                                 ))}
                             </ul>
                         </div>
+                        
+                        <div className="bg-yellow-50 p-4 rounded-lg mb-6">
+                            <div className="flex items-center space-x-2">
+                                <IconAlertCircle className="text-yellow-600" size={20} />
+                                <div>
+                                    <h4 className="font-semibold text-yellow-800">Camera & Microphone Access Required</h4>
+                                    <p className="text-yellow-700 text-sm mb-2">
+                                        This interview session requires camera and microphone access to record your responses and provide live transcription. 
+                                        Please allow access when prompted by your browser.
+                                    </p>
+                                    <div className="flex items-center space-x-4 text-xs">
+                                        <div className="flex items-center space-x-1">
+                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                            <span>Video Recording</span>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                            <span>Live Transcription</span>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                            <span>AI Analysis</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <button
-                            onClick={() => setSessionStarted(true)}
-                            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold"
+                            onClick={async () => {
+                                const permissionGranted = await requestCameraPermission();
+                                if (permissionGranted) {
+                                    setSessionStarted(true);
+                                }
+                            }}
+                            disabled={requestingPermission}
+                            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold flex items-center space-x-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Start Interview Session
+                            {requestingPermission ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                    <span>Requesting Camera Access...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <IconPlayerPlay size={20} />
+                                    <span>Start Interview Session</span>
+                                </>
+                            )}
                         </button>
+                        
+                        {cameraError && (
+                            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <div className="flex items-start space-x-2">
+                                    <IconAlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={20} />
+                                    <div>
+                                        <h4 className="font-semibold text-red-800">Camera Access Required</h4>
+                                        <p className="text-red-700 text-sm mt-1">{cameraError}</p>
+                                        <button
+                                            onClick={requestCameraPermission}
+                                            className="mt-2 bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700 transition-colors"
+                                        >
+                                            Try Again
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -367,12 +627,20 @@ export default function InterviewPage() {
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center space-x-4">
                                     <h2 className="text-xl font-semibold text-gray-800">Interview Session Active</h2>
-                                    {isRecording && (
-                                        <div className="flex items-center space-x-2 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
-                                            <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                                            <span>Recording</span>
-                                        </div>
-                                    )}
+                                    <div className="flex items-center space-x-3">
+                                        {isRecording && (
+                                            <div className="flex items-center space-x-2 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
+                                                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                                <span>Recording</span>
+                                            </div>
+                                        )}
+                                        {isTranscribing && (
+                                            <div className="flex items-center space-x-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                                                <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                                                <span>Transcribing</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <button
                                     onClick={stopSession}
@@ -387,21 +655,21 @@ export default function InterviewPage() {
                         {/* Question Display */}
                         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold">
+                                <h3 className="text-black text-lg font-semibold">
                                     Question {currentQuestionIndex + 1} of {interviewQuestions.length}
                                 </h3>
                                 <div className="flex space-x-2">
                                     <button
                                         onClick={prevQuestion}
                                         disabled={currentQuestionIndex === 0}
-                                        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
+                                        className="text-black px-3 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
                                     >
                                         Previous
                                     </button>
                                     <button
                                         onClick={nextQuestion}
                                         disabled={currentQuestionIndex === interviewQuestions.length - 1}
-                                        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
+                                        className="text-black px-3 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
                                     >
                                         Next
                                     </button>
@@ -417,14 +685,50 @@ export default function InterviewPage() {
                         {/* Video Recording Section */}
                         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
                             <div className="relative">
-                                <Webcam
-                                    audio={true}
-                                    ref={webcamRef}
-                                    videoConstraints={videoConstraints}
-                                    onUserMedia={() => setIsCameraReady(true)}
-                                    onUserMediaError={(error) => setError("Camera access denied: " + error.message)}
-                                    className="w-full max-w-2xl mx-auto rounded-lg"
-                                />
+                                {permissionGranted ? (
+                                    <Webcam
+                                        audio={true}
+                                        ref={webcamRef}
+                                        videoConstraints={videoConstraints}
+                                        onUserMedia={() => {
+                                            console.log('Webcam ready');
+                                            setIsCameraReady(true);
+                                            setCameraError(null);
+                                        }}
+                                        onUserMediaError={(error) => {
+                                            console.error('Webcam error:', error);
+                                            const errorMsg = `Camera error: ${error.message || error}`;
+                                            setCameraError(errorMsg);
+                                            setError(errorMsg);
+                                            setIsCameraReady(false);
+                                        }}
+                                        className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
+                                        screenshotFormat="image/jpeg"
+                                    />
+                                ) : (
+                                    <div className="w-full max-w-2xl mx-auto bg-gray-100 rounded-lg flex items-center justify-center" style={{height: '480px'}}>
+                                        <div className="text-center p-8">
+                                            <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <IconAlertCircle className="text-gray-500" size={32} />
+                                            </div>
+                                            <h3 className="text-lg font-semibold text-gray-700 mb-2">Camera Access Required</h3>
+                                            <p className="text-gray-600 mb-4">
+                                                Please allow camera access to start your interview practice session.
+                                            </p>
+                                            <button
+                                                onClick={requestCameraPermission}
+                                                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                            >
+                                                Enable Camera
+                                            </button>
+                                            {cameraError && (
+                                                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                                    <p className="text-red-800 text-sm">{cameraError}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                                 {isRecording && (
                                     <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-2">
                                         <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
@@ -470,15 +774,85 @@ export default function InterviewPage() {
                             </div>
                         </div>
 
-                        {/* Transcript Section */}
+                        {/* Live Transcript Section */}
                         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                            <h3 className="text-lg font-semibold mb-4">Live Transcript</h3>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-black text-lg font-semibold">Live Transcript</h3>
+                                <div className="flex items-center space-x-2">
+                                    {isTranscribing && (
+                                        <div className="flex items-center space-x-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                                            <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                                            <span>Transcribing</span>
+                                        </div>
+                                    )}
+                                    {!speechSupported && (
+                                        <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                                            Speech recognition not supported
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
                             <div className="bg-gray-50 p-4 rounded min-h-32 max-h-64 overflow-y-auto">
-                                {transcript || (
-                                    <p className="text-gray-500 italic">
-                                        {isRecording ? 'Listening...' : 'Start recording to see transcript here'}
-                                    </p>
+                                {transcript || interimTranscript ? (
+                                    <div className="space-y-2">
+                                        {/* Final transcript */}
+                                        {transcript && (
+                                            <div className="text-gray-900">
+                                                {transcript.split('\n').map((line, index) => (
+                                                    <p key={index} className="mb-2">{line}</p>
+                                                ))}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Interim transcript (live/in-progress) */}
+                                        {interimTranscript && (
+                                            <div className="text-gray-500 italic border-l-2 border-blue-400 pl-3">
+                                                <span className="text-xs text-blue-600 block mb-1">Speaking...</span>
+                                                {interimTranscript}
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <p className="text-gray-500 italic mb-2">
+                                            {isRecording 
+                                                ? (speechSupported ? 'Listening for speech...' : 'Recording (no transcription)')
+                                                : 'Start recording to see live transcript here'
+                                            }
+                                        </p>
+                                        {isRecording && speechSupported && (
+                                            <p className="text-xs text-gray-400">
+                                                Speak clearly into your microphone for best results
+                                            </p>
+                                        )}
+                                    </div>
                                 )}
+                            </div>
+                            
+                            {/* Transcript Controls */}
+                            <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                                <div className="text-sm text-gray-600">
+                                    Words: {transcript.split(' ').filter(word => word.length > 0).length}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => setTranscript('')}
+                                        disabled={!transcript}
+                                        className="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Clear
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(transcript);
+                                        }}
+                                        disabled={!transcript}
+                                        className="text-sm bg-blue-200 text-blue-700 px-3 py-1 rounded hover:bg-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Copy
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
