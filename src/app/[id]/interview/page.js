@@ -143,6 +143,15 @@ export default function InterviewPage() {
         facingMode: "user"
     };
 
+    function cleanFeedback(text) {
+    return text
+        .replace(/[#*]/g, "")               // remove # and *
+        .replace(/\*\*(.*?)\*\*/g, "$1")    // remove markdown bold
+        .replace(/\n\s*\n/g, "\n")          // collapse extra blank lines
+        .replace(/•/g, "• ")                // fix bullet spacing
+        .trim();
+}
+
     // Request camera and microphone permission explicitly
     const requestCameraPermission = async () => {
         try {
@@ -588,66 +597,64 @@ export default function InterviewPage() {
     };
 
     const analyzeInterview = async () => {
-        // Save the last answer before analyzing
-        saveCurrentAnswer();
-        
-        const finalAnswers = [...questionAnswers];
-        finalAnswers[currentQuestionIndex] = transcript;
-        
-        if (finalAnswers.filter(a => a && a.trim()).length === 0) {
-            setError('No answers recorded. Please answer at least one question.');
-            return;
+    saveCurrentAnswer();
+    
+    const finalAnswers = [...questionAnswers];
+    finalAnswers[currentQuestionIndex] = transcript;
+
+    if (finalAnswers.filter(a => a && a.trim()).length === 0) {
+        setError('No answers recorded. Please answer at least one question.');
+        return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+        // ✅ Use FormData instead of JSON
+        const formData = new FormData();
+        formData.append("transcript", finalAnswers.join("\n\n"));
+        formData.append("userId", params.id);
+        formData.append("questions", JSON.stringify(interviewQuestions));
+
+        if (videoBlob) {
+            formData.append("video", videoBlob, "interview-video.webm");
         }
 
-        setIsLoading(true);
-        setError(null);
+        const response = await fetch('/api/interview/evaluate', {
+            method: 'POST',
+            body: formData,  // ❗ No headers here
+        });
 
-        try {
-            // Use the new evaluation API
-            const response = await fetch('/api/interview/evaluate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    answers: finalAnswers,
-                    selectedSkills: selectedSkills,
-                    questions: interviewQuestions
-                }),
+        if (!response.ok) {
+            throw new Error('Evaluation failed');
+        }
+
+        const result = await response.json();
+
+        setAnalysis(result);
+        setSessionComplete(true);
+
+        // Optional: Save to Firebase
+        if (db) {
+            await addDoc(collection(db, "interviews"), {
+                userId: params.id,
+                answers: finalAnswers,
+                questions: interviewQuestions,
+                selectedSkills: selectedSkills,
+                evaluation: result,
+                createdAt: serverTimestamp(),
             });
-
-            if (!response.ok) {
-                throw new Error('Evaluation failed');
-            }
-
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.error || 'Evaluation failed');
-            }
-            
-            setAnalysis(result.data);
-
-            // Save to Firebase
-            if (db) {
-                await addDoc(collection(db, "interviews"), {
-                    userId: params.id,
-                    answers: finalAnswers,
-                    questions: interviewQuestions,
-                    selectedSkills: selectedSkills,
-                    evaluation: result.data,
-                    createdAt: serverTimestamp(),
-                });
-            }
-
-            setSessionComplete(true);
-        } catch (err) {
-            console.error('Analysis error:', err);
-            setError('Failed to analyze interview: ' + err.message);
-        } finally {
-            setIsLoading(false);
         }
-    };
+
+    } catch (err) {
+        console.error('Analysis error:', err);
+        setError('Failed to analyze interview: ' + err.message);
+    } finally {
+        setIsLoading(false);
+    }
+};
+
 
     const toggleSkillSelection = (skillId) => {
         setSelectedSkills(prev => {
@@ -1263,210 +1270,149 @@ export default function InterviewPage() {
                     </>
                 )}
 
-                {/* Analysis Results */}
-                {sessionComplete && analysis && analysis.performance && (
-                    <div className="space-y-6">
-                        {/* Overall Score Card */}
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl border border-green-200 p-8">
-                            <div className="text-center mb-6">
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Interview Complete! 🎉</h2>
-                                <p className="text-gray-600">Here's your detailed performance analysis</p>
-                            </div>
+               {/* Analysis Results */}
+{sessionComplete && analysis && (
+    <div className="space-y-10 mt-10">
 
-                            <div className="flex justify-center mb-6">
-                                <div className="text-center">
-                                    <div className="text-6xl font-bold text-green-600 mb-2">
-                                        {analysis.performance.overallScore}/10
-                                    </div>
-                                    <p className="text-gray-700 font-medium">Overall Score</p>
-                                    <p className="text-sm text-gray-500">{analysis.performance.totalQuestions} questions answered</p>
-                                </div>
-                            </div>
-                        </div>
+        {/* 🎉 Header */}
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-3xl p-8 shadow-xl">
+            <div className="text-center mb-6">
+                <h2 className="text-4xl font-extrabold text-gray-900 mb-2">
+                    Interview Analysis Complete! 🎉
+                </h2>
+                <p className="text-gray-600 text-lg">
+                    Here's your personalized AI-powered performance summary
+                </p>
+            </div>
 
-                        {/* Skill Breakdown */}
-                        <div className="bg-white rounded-3xl border border-gray-200 p-8">
-                            <h3 className="text-2xl font-bold text-gray-900 mb-6">Performance by Skill</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {Object.entries(analysis.performance.skillDetails).map(([skill, details]) => (
-                                    <div key={skill} className={`p-4 rounded-lg border-2 ${
-                                        details.category === 'best' ? 'bg-green-50 border-green-300' :
-                                        details.category === 'good' ? 'bg-blue-50 border-blue-300' :
-                                        'bg-orange-50 border-orange-300'
-                                    }`}>
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h4 className="font-semibold text-gray-900 capitalize">{skill}</h4>
-                                            <span className={`text-2xl font-bold ${
-                                                details.category === 'best' ? 'text-green-600' :
-                                                details.category === 'good' ? 'text-blue-600' :
-                                                'text-orange-600'
-                                            }`}>
-                                                {details.averageScore}
-                                            </span>
-                                        </div>
-                                        <div className="text-sm text-gray-600">
-                                            {details.totalQuestions} question{details.totalQuestions !== 1 ? 's' : ''}
-                                        </div>
-                                        {details.needsImprovement && (
-                                            <div className="mt-2 text-xs text-orange-700 font-medium">
-                                                ⚠️ Needs improvement
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+            {/* Overall Score */}
+            <div className="flex justify-center mb-4">
+                <div className="text-center">
+                    <div className="text-7xl font-extrabold bg-red-900 bg-clip-text text-transparent drop-shadow-sm">
+                        {analysis.overallScore}/10
+                    </div>
+                    <p className="text-gray-700 font-medium mt-2 text-lg">Overall Score</p>
+                    <p className="text-sm text-gray-500">Evaluated from your full transcript</p>
+                </div>
+            </div>
+        </div>
 
-                        {/* Strengths and Weaknesses */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {analysis.performance.strengths.length > 0 && (
-                                <div className="bg-green-50 rounded-2xl border border-green-200 p-6">
-                                    <h3 className="text-xl font-bold text-green-800 mb-4">💪 Your Strengths</h3>
-                                    <ul className="space-y-2">
-                                        {analysis.performance.strengths.map((skill, index) => (
-                                            <li key={index} className="flex items-center space-x-2 text-green-700">
-                                                <span className="text-green-500">✓</span>
-                                                <span className="capitalize font-medium">{skill}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
+        {/* ⭐ Score Breakdown */}
+        <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-md">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Score Breakdown</h3>
 
-                            {analysis.performance.weaknesses.length > 0 && (
-                                <div className="bg-orange-50 rounded-2xl border border-orange-200 p-6">
-                                    <h3 className="text-xl font-bold text-orange-800 mb-4">📚 Areas to Improve</h3>
-                                    <ul className="space-y-2">
-                                        {analysis.performance.weaknesses.map((skill, index) => (
-                                            <li key={index} className="flex items-center space-x-2 text-orange-700">
-                                                <span className="text-orange-500">→</span>
-                                                <span className="capitalize font-medium">{skill}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                        {/* Recommendations */}
-                        {analysis.performance.recommendations && analysis.performance.recommendations.length > 0 && (
-                            <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
-                                <h3 className="text-xl font-bold text-blue-800 mb-4">💡 Recommendations</h3>
-                                <div className="space-y-3">
-                                    {analysis.performance.recommendations.map((rec, index) => (
-                                        <div key={index} className="bg-white rounded-lg p-4 border border-blue-100">
-                                            <p className="text-gray-800">{rec.message}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Question-by-Question Breakdown with Answers */}
-                        <div className="bg-white rounded-3xl border border-gray-200 p-8">
-                            <h3 className="text-2xl font-bold text-gray-900 mb-6">📝 Your Answers & Analysis</h3>
-                            <div className="space-y-6">
-                                {analysis.evaluations && analysis.evaluations.map((evaluation, index) => (
-                                    <div key={index} className="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-300 transition-colors">
-                                        {/* Question Header */}
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex-1">
-                                                <div className="flex items-center space-x-2 mb-2">
-                                                    <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                                                        Q{index + 1}
-                                                    </span>
-                                                    <span className="text-xs text-gray-500 capitalize">
-                                                        {evaluation.skill}
-                                                    </span>
-                                                </div>
-                                                <h4 className="font-semibold text-gray-900 text-lg">{evaluation.question}</h4>
-                                            </div>
-                                            <span className={`ml-4 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap ${
-                                                evaluation.category === 'best' ? 'bg-green-100 text-green-700' :
-                                                evaluation.category === 'good' ? 'bg-blue-100 text-blue-700' :
-                                                evaluation.category === 'insufficient' ? 'bg-red-100 text-red-700' :
-                                                'bg-orange-100 text-orange-700'
-                                            }`}>
-                                                {evaluation.score}/10
-                                            </span>
-                                        </div>
-
-                                        {/* User's Answer */}
-                                        <div className="mb-4">
-                                            <div className="flex items-center space-x-2 mb-2">
-                                                <span className="text-sm font-semibold text-gray-700">Your Answer:</span>
-                                                <span className="text-xs text-gray-500">
-                                                    ({evaluation.userAnswer ? evaluation.userAnswer.split(' ').filter(w => w.length > 0).length : 0} words)
-                                                </span>
-                                            </div>
-                                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                                {evaluation.userAnswer && evaluation.userAnswer.trim() ? (
-                                                    <p className="text-gray-800 whitespace-pre-wrap">{evaluation.userAnswer}</p>
-                                                ) : (
-                                                    <p className="text-gray-400 italic">No answer provided</p>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Evaluation Feedback */}
-                                        <div className="mb-3">
-                                            <span className="text-sm font-semibold text-gray-700 block mb-2">Feedback:</span>
-                                            <p className="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-3">
-                                                {evaluation.feedback}
-                                            </p>
-                                        </div>
-
-                                        {/* Keywords Matched */}
-                                        {evaluation.matchedKeywords && evaluation.matchedKeywords.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 items-center">
-                                                <span className="text-xs font-semibold text-gray-600">✓ Keywords covered:</span>
-                                                {evaluation.matchedKeywords.map((keyword, kidx) => (
-                                                    <span key={kidx} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
-                                                        {keyword}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        {/* Performance Category Badge */}
-                                        <div className="mt-3 pt-3 border-t border-gray-200">
-                                            <span className="text-xs text-gray-500">
-                                                Performance Level: 
-                                                <span className={`ml-2 font-semibold ${
-                                                    evaluation.category === 'best' ? 'text-green-600' :
-                                                    evaluation.category === 'good' ? 'text-blue-600' :
-                                                    evaluation.category === 'insufficient' ? 'text-red-600' :
-                                                    'text-orange-600'
-                                                }`}>
-                                                    {evaluation.category === 'best' ? '🌟 Excellent' :
-                                                     evaluation.category === 'good' ? '👍 Good' :
-                                                     evaluation.category === 'insufficient' ? '❌ Insufficient' :
-                                                     '📖 Basic'}
-                                                </span>
-                                                {evaluation.matchPercentage !== undefined && (
-                                                    <span className="ml-2">
-                                                        ({Math.round(evaluation.matchPercentage)}% keyword match)
-                                                    </span>
-                                                )}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Action Button */}
-                        <div className="text-center">
-                            <button
-                                onClick={startNewSession}
-                                className="flex items-center space-x-2 mx-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg font-semibold text-lg"
-                            >
-                                <IconRotateClockwise size={24} />
-                                <span>Start New Interview</span>
-                            </button>
+                {/* Each Score Card */}
+                {[
+                    { label: "Communication", value: analysis.communication, color: "purple" },
+                    { label: "Confidence", value: analysis.confidence, color: "blue" },
+                    { label: "Content Quality", value: analysis.content, color: "green" },
+                    { label: "Delivery", value: analysis.delivery, color: "yellow" }
+                ].map((score, i) => (
+                    <div
+                        key={i}
+                        className={`rounded-xl p-5 border-2 shadow-sm bg-${score.color}-50 border-${score.color}-300`}
+                    >
+                        <h4 className="font-semibold text-gray-800 mb-2">{score.label}</h4>
+                        <div
+                            className={`text-4xl font-extrabold text-${score.color}-700`}
+                        >
+                            {score.value}/10
                         </div>
                     </div>
-                )}
+                ))}
+            </div>
+        </div>
+
+        {/* 📊 Metrics */}
+        <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-sm">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Metrics Overview</h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {Object.entries(analysis.metrics).map(([key, val], i) => (
+                    <div key={i} className="bg-white rounded-xl border p-4">
+                        <p className="font-semibold text-gray-700 capitalize">
+                            {key.replace(/([A-Z])/g, " $1")}
+                        </p>
+                        <p className="text-gray-800 mt-1 text-lg">
+                            {typeof val === "string" ? val : JSON.stringify(val)}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* 📝 Feedback */}
+       {/* 🟦 Uplifted Feedback Card */}
+<div className="bg-white shadow-xl rounded-3xl border border-gray-200 p-8 mt-10">
+    
+    <h3 className="text-2xl font-bold text-blue-900 mb-4">
+        Detailed AI Feedback
+    </h3>
+
+    <div className="space-y-3 text-gray-800 leading-relaxed text-[15px]">
+        {cleanFeedback(analysis.feedback)
+            .split("\n")
+            .map((line, i) => {
+
+                // Bullet styling
+                if (line.trim().startsWith("•")) {
+                    return (
+                        <div key={i} className="flex items-start space-x-2 pl-2">
+                            <span className="text-blue-600 mt-1">•</span>
+                            <span>{line.replace("•", "").trim()}</span>
+                        </div>
+                    );
+                }
+
+                // Section Headings
+                if (
+                    line.trim().toLowerCase().includes("communication") ||
+                    line.trim().toLowerCase().includes("confidence") ||
+                    line.trim().toLowerCase().includes("content quality") ||
+                    line.trim().toLowerCase().includes("delivery") ||
+                    line.trim().toLowerCase().includes("suggestions")
+                ) {
+                    return (
+                        <h4
+                            key={i}
+                            className="font-semibold text-blue-800 text-lg mt-6 border-l-4 border-blue-400 pl-3"
+                        >
+                            {line.trim()}
+                        </h4>
+                    );
+                }
+
+                // Normal paragraph
+                return (
+                    <p key={i} className="text-gray-700">
+                        {line}
+                    </p>
+                );
+            })}
+    </div>
+</div>
+
+
+        {/* Date */}
+        <p className="text-center text-sm text-gray-500">
+            Analyzed on: {new Date(analysis.analysisDate).toLocaleString()}
+        </p>
+
+        {/* Restart Button */}
+        <div className="text-center mt-8">
+    <button
+        onClick={startNewSession}
+        className="bg-blue-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-colors shadow"
+    >
+        Start New Interview
+    </button>
+</div>
+
+    </div>
+)}
+
             </div>
         </div>
     );

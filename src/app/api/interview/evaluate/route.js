@@ -42,9 +42,38 @@ export async function POST(request) {
 -------------------------------------------- */
 
 function analyzeInterviewContent(transcript, questions) {
-    const words = transcript.toLowerCase().split(/\s+/);
+    console.log("🔥 analyzeInterviewContent() CALLED");
+    console.log("📌 Raw transcript:", transcript);
+    console.log("📌 Transcript type:", typeof transcript);
+    console.log("📌 Transcript length:", transcript?.length);
+    console.log("📌 Questions:", questions);
+    console.log("📌 Questions type:", typeof questions);
+    console.log("📌 Questions length:", questions?.length);
+
+    // Check for null/undefined
+    if (!transcript) {
+        console.error("❌ ERROR: transcript is NULL or UNDEFINED");
+        throw new Error("Transcript missing in analyzeInterviewContent()");
+    }
+
+    if (!Array.isArray(questions)) {
+        console.error("❌ ERROR: questions is NOT an array:", questions);
+    }
+
+    // Splitting transcript into words
+    console.log("📝 Splitting transcript into words...");
+    let words;
+    try {
+        words = transcript.toLowerCase().split(/\s+/);
+        console.log("✅ Words array created. Count:", words.length);
+    } catch (err) {
+        console.error("❌ ERROR while splitting transcript:", err);
+        throw err;
+    }
+
     const wordCount = words.length;
 
+    console.log("📊 Computing metrics...");
     const metrics = {
         wordCount,
         avgWordsPerQuestion:
@@ -55,12 +84,17 @@ function analyzeInterviewContent(transcript, questions) {
         fillerWords: countFillerWords(words),
         positiveWords: countPositiveWords(words),
         technicalTerms: countTechnicalTerms(words),
+
         sentenceComplexity: analyzeSentenceComplexity(transcript),
-        speakingPace: estimateSpeakingPace(wordCount), // NEW
-        clarityIssues: detectClarityProblems(transcript), // NEW
-        starMethodUsage: detectSTARUsage(transcript), // NEW behavioral check
+        speakingPace: estimateSpeakingPace(wordCount),
+        clarityIssues: detectClarityProblems(transcript),
+
+        starMethodUsage: detectSTARUsage(transcript),
     };
 
+    console.log("📌 Metrics generated:", metrics);
+
+    console.log("📊 Calculating scores...");
     const scores = {
         communication: scoreCommunication(metrics),
         confidence: scoreConfidence(metrics),
@@ -68,24 +102,40 @@ function analyzeInterviewContent(transcript, questions) {
         delivery: scoreDelivery(metrics),
     };
 
+    console.log("📌 Scores generated:", scores);
+
     const overallScore = Math.round(
         (scores.communication +
-            scores.confidence +
-            scores.content +
-            scores.delivery) /
-            4
+        scores.confidence +
+        scores.content +
+        scores.delivery) / 4
     );
 
-    const feedback = generateFullFeedback(metrics, scores, overallScore);
+    console.log("🎯 Overall Score:", overallScore);
 
-    return {
+    let feedback;
+    try {
+        console.log("📝 Generating feedback...");
+        feedback = generateFullFeedback(metrics, scores, overallScore);
+        console.log("✅ Feedback generated.");
+    } catch (err) {
+        console.error("❌ ERROR generating feedback:", err);
+        throw err;
+    }
+
+    const finalOutput = {
         ...scores,
         overallScore,
         metrics,
         feedback,
         analysisDate: new Date().toISOString(),
     };
+
+    console.log("📦 FINAL ANALYSIS OUTPUT:", finalOutput);
+
+    return finalOutput;
 }
+
 
 /* -------------------------------------------
    📌 METRIC EXTRACTION FUNCTIONS
