@@ -1,0 +1,110 @@
+{
+  "skill": "python",
+  "questions": [
+    {
+      "id": "py_1",
+      "question": "What are decorators in Python and how do you use them?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["decorator", "function", "wrapper", "@", "syntax"],
+          "description": "Basic decorator concept"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["decorator", "higher-order function", "wrapper", "functools", "wraps", "closure", "metadata", "arguments", "return value"],
+          "description": "Good understanding of decorator mechanics"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["decorator", "higher-order function", "closure", "functools.wraps", "class decorator", "decorator with arguments", "chaining", "property", "staticmethod", "classmethod", "practical use cases", "logging", "authentication", "caching"],
+          "description": "Expert level with practical applications"
+        }
+      }
+    },
+    {
+      "id": "py_2",
+      "question": "Explain the difference between lists and tuples in Python.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["list", "tuple", "mutable", "immutable", "brackets", "parentheses"],
+          "description": "Basic list vs tuple understanding"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["mutable", "immutable", "performance", "memory", "hashable", "dictionary keys", "methods", "indexing", "slicing", "use cases"],
+          "description": "Good understanding with use cases"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["mutability", "immutability", "memory efficiency", "performance", "hashable", "dictionary keys", "tuple unpacking", "named tuples", "list comprehension", "generator", "time complexity", "space complexity", "best practices"],
+          "description": "Comprehensive with performance considerations"
+        }
+      }
+    },
+    {
+      "id": "py_3",
+      "question": "What is a generator in Python and when would you use it?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["generator", "yield", "iterator", "function", "memory"],
+          "description": "Basic generator concept"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["generator", "yield", "lazy evaluation", "memory efficient", "iterator protocol", "next", "StopIteration", "generator expression", "use cases"],
+          "description": "Good understanding of generators"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["generator", "yield", "lazy evaluation", "memory efficiency", "iterator protocol", "generator expression", "send method", "throw method", "close method", "coroutines", "pipeline", "infinite sequences", "performance", "practical applications"],
+          "description": "Expert level with advanced patterns"
+        }
+      }
+    },
+    {
+      "id": "py_4",
+      "question": "How does Python's garbage collection work?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["garbage collection", "memory", "automatic", "reference", "delete"],
+          "description": "Basic GC awareness"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["reference counting", "garbage collector", "circular references", "gc module", "generations", "threshold", "memory management", "del statement"],
+          "description": "Good understanding of GC mechanism"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["reference counting", "generational garbage collection", "circular references", "gc module", "three generations", "threshold", "mark and sweep", "weak references", "memory leaks", "optimization", "gc.collect", "gc.disable", "performance impact"],
+          "description": "Deep understanding with optimization"
+        }
+      }
+    },
+    {
+      "id": "py_5",
+      "question": "Explain the Global Interpreter Lock (GIL) in Python.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["GIL", "thread", "lock", "single", "execution"],
+          "description": "Basic GIL awareness"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["GIL", "thread safety", "mutex", "single thread execution", "CPython", "multiprocessing", "I/O bound", "CPU bound", "limitations"],
+          "description": "Good understanding of GIL implications"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["Global Interpreter Lock", "thread safety", "mutex", "CPython implementation", "reference counting", "multiprocessing", "threading", "asyncio", "I/O bound vs CPU bound", "workarounds", "Jython", "IronPython", "performance implications", "concurrent.futures"],
+          "description": "Expert level with workarounds and alternatives"
+        }
+      }
+    }
+  ]
+}

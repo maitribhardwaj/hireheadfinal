@@ -26,17 +26,116 @@ export default function InterviewPage() {
     const [videoBlob, setVideoBlob] = useState(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [interviewQuestions] = useState([
-        "Tell me about yourself and your background.",
-        "What are your greatest strengths?",
-        "Describe a challenging situation you faced and how you handled it.",
-        "Where do you see yourself in 5 years?",
-        "Why do you want to work for our company?"
-    ]);
+    const [interviewQuestions, setInterviewQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [sessionStarted, setSessionStarted] = useState(false);
     const [sessionComplete, setSessionComplete] = useState(false);
     const [showStopConfirm, setShowStopConfirm] = useState(false);
+    const [selectedSkills, setSelectedSkills] = useState([]);
+    const [showSkillSelection, setShowSkillSelection] = useState(true);
+    const [questionAnswers, setQuestionAnswers] = useState([]);
+
+    const availableSkills = [
+        { id: 'javascript', name: 'JavaScript', color: 'yellow' },
+        { id: 'react', name: 'React', color: 'blue' },
+        { id: 'nodejs', name: 'Node.js', color: 'green' },
+        { id: 'python', name: 'Python', color: 'indigo' },
+        { id: 'java', name: 'Java', color: 'red' },
+        { id: 'sql', name: 'SQL', color: 'purple' },
+        { id: 'frontend', name: 'Frontend Developer', color: 'pink' },
+        { id: 'backend', name: 'Backend Developer', color: 'emerald' },
+        { id: 'fullstack', name: 'Full Stack Developer', color: 'violet' },
+        { id: 'devops', name: 'DevOps', color: 'orange' },
+        { id: 'dataScience', name: 'Data Science', color: 'cyan' },
+        { id: 'ml', name: 'Machine Learning', color: 'teal' }
+    ];
+
+    const skillQuestions = {
+        javascript: [
+            "Explain the difference between let, const, and var in JavaScript.",
+            "What are closures in JavaScript and how do you use them?",
+            "Describe the event loop in JavaScript.",
+            "What is the difference between == and === in JavaScript?",
+            "Explain promises and async/await in JavaScript."
+        ],
+        react: [
+            "What are React hooks and why are they useful?",
+            "Explain the virtual DOM and how React uses it.",
+            "What is the difference between state and props in React?",
+            "How do you optimize performance in a React application?",
+            "Explain the component lifecycle in React."
+        ],
+        nodejs: [
+            "What is Node.js and how does it differ from browser JavaScript?",
+            "Explain the event-driven architecture of Node.js.",
+            "What are streams in Node.js and when would you use them?",
+            "How do you handle errors in Node.js applications?",
+            "Explain middleware in Express.js."
+        ],
+        python: [
+            "What are decorators in Python and how do you use them?",
+            "Explain the difference between lists and tuples in Python.",
+            "What is a generator in Python and when would you use it?",
+            "How does Python's garbage collection work?",
+            "Explain the Global Interpreter Lock (GIL) in Python."
+        ],
+        java: [
+            "Explain the difference between abstract classes and interfaces in Java.",
+            "What is the Java Virtual Machine (JVM) and how does it work?",
+            "Describe the different types of memory areas in Java.",
+            "What are Java Streams and how do you use them?",
+            "Explain exception handling in Java."
+        ],
+        sql: [
+            "What is the difference between INNER JOIN and LEFT JOIN?",
+            "Explain database normalization and its benefits.",
+            "What are indexes and how do they improve query performance?",
+            "Describe the ACID properties of database transactions.",
+            "What is the difference between WHERE and HAVING clauses?"
+        ],
+        frontend: [
+            "How do you ensure your web applications are accessible?",
+            "Explain responsive design and mobile-first approach.",
+            "What are your strategies for optimizing website performance?",
+            "How do you handle cross-browser compatibility issues?",
+            "Describe your approach to state management in frontend applications."
+        ],
+        backend: [
+            "How do you design RESTful APIs?",
+            "Explain your approach to database schema design.",
+            "How do you handle authentication and authorization?",
+            "What strategies do you use for API rate limiting?",
+            "Describe your experience with microservices architecture."
+        ],
+        fullstack: [
+            "How do you approach building a full-stack application from scratch?",
+            "Explain how you handle communication between frontend and backend.",
+            "What is your experience with deployment and CI/CD pipelines?",
+            "How do you manage application state across the stack?",
+            "Describe a challenging full-stack project you've worked on."
+        ],
+        devops: [
+            "Explain the concept of Infrastructure as Code.",
+            "What is your experience with containerization and Docker?",
+            "How do you implement continuous integration and deployment?",
+            "Describe your approach to monitoring and logging.",
+            "What strategies do you use for scaling applications?"
+        ],
+        dataScience: [
+            "Explain the difference between supervised and unsupervised learning.",
+            "How do you handle missing data in a dataset?",
+            "What is feature engineering and why is it important?",
+            "Describe your experience with data visualization.",
+            "How do you evaluate the performance of a machine learning model?"
+        ],
+        ml: [
+            "Explain the bias-variance tradeoff in machine learning.",
+            "What is overfitting and how do you prevent it?",
+            "Describe different types of neural network architectures.",
+            "How do you choose the right algorithm for a problem?",
+            "Explain the concept of transfer learning."
+        ]
+    };
 
     const videoConstraints = {
         width: 1280,
@@ -44,7 +143,7 @@ export default function InterviewPage() {
         facingMode: "user"
     };
 
-    // Request camera permission explicitly
+    // Request camera and microphone permission explicitly
     const requestCameraPermission = async () => {
         try {
             setRequestingPermission(true);
@@ -53,37 +152,55 @@ export default function InterviewPage() {
             
             // Check if getUserMedia is supported
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error('Camera access is not supported in this browser');
+                throw new Error('Camera and microphone access is not supported in this browser');
             }
             
-            console.log('Requesting camera permission...');
+            console.log('🎥 Requesting camera and microphone permission...');
             
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: videoConstraints, 
-                audio: true 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
             });
             
-            console.log('Camera permission granted');
+            console.log('✅ Camera and microphone permission granted');
+            console.log('🎤 Audio tracks:', stream.getAudioTracks().length);
+            console.log('📹 Video tracks:', stream.getVideoTracks().length);
+            
+            // Test if audio is working
+            const audioTracks = stream.getAudioTracks();
+            if (audioTracks.length > 0) {
+                console.log('🎤 Microphone enabled:', audioTracks[0].label);
+            } else {
+                console.warn('⚠️ No audio tracks found');
+            }
             
             // Permission granted, stop the stream as webcam component will handle it
-            stream.getTracks().forEach(track => track.stop());
+            stream.getTracks().forEach(track => {
+                console.log(`Stopping track: ${track.kind} - ${track.label}`);
+                track.stop();
+            });
+            
             setPermissionGranted(true);
             setIsCameraReady(true);
             
             return true;
             
         } catch (err) {
-            console.error('Camera permission error:', err);
-            let errorMessage = 'Camera access denied. ';
+            console.error('❌ Camera/Microphone permission error:', err);
+            let errorMessage = 'Camera and microphone access denied. ';
             
             if (err.name === 'NotAllowedError') {
-                errorMessage += 'Please click "Allow" when your browser asks for camera permission, then try again.';
+                errorMessage += 'Please click "Allow" when your browser asks for camera and microphone permission, then try again.';
             } else if (err.name === 'NotFoundError') {
-                errorMessage += 'No camera found. Please connect a camera and try again.';
+                errorMessage += 'No camera or microphone found. Please connect devices and try again.';
             } else if (err.name === 'NotReadableError') {
-                errorMessage += 'Camera is being used by another application. Please close other apps using the camera.';
+                errorMessage += 'Camera or microphone is being used by another application. Please close other apps.';
             } else if (err.name === 'OverconstrainedError') {
-                errorMessage += 'Camera does not support the required settings.';
+                errorMessage += 'Camera or microphone does not support the required settings.';
             } else {
                 errorMessage += err.message;
             }
@@ -99,8 +216,8 @@ export default function InterviewPage() {
         }
     };
 
-    // Speech Recognition Functions
-    const startSpeechRecognition = () => {
+    // Speech Recognition Functions - Improved for better accuracy
+    const startSpeechRecognition = useCallback(() => {
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
@@ -110,99 +227,185 @@ export default function InterviewPage() {
                 return;
             }
 
+            // Stop any existing recognition first
+            if (recognitionRef.current) {
+                try {
+                    recognitionRef.current.stop();
+                } catch (e) {
+                    console.log('Error stopping previous recognition:', e);
+                }
+            }
+
             setSpeechSupported(true);
             const recognition = new SpeechRecognition();
             
-            // Configure recognition settings
+            // Configure recognition settings for better accuracy
             recognition.continuous = true;
             recognition.interimResults = true;
             recognition.lang = "en-US";
-            recognition.maxAlternatives = 1;
+            recognition.maxAlternatives = 3; // Get multiple alternatives for better accuracy
+            
+            let restartTimeout = null;
+            let isManualStop = false;
 
             recognition.onstart = () => {
-                console.log('Speech recognition started');
+                console.log('✅ Speech recognition started successfully');
                 setIsTranscribing(true);
+                setError(null);
             };
 
             recognition.onresult = (event) => {
+                console.log('🎤 Speech detected, processing...');
                 let finalTranscript = '';
                 let interimTranscript = '';
                 
+                // Process all results from the event
                 for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
+                    const result = event.results[i];
                     
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript + ' ';
+                    // Get the best alternative (highest confidence)
+                    let bestTranscript = result[0].transcript;
+                    let bestConfidence = result[0].confidence;
+                    
+                    // Check other alternatives for better confidence
+                    for (let j = 1; j < result.length; j++) {
+                        if (result[j].confidence > bestConfidence) {
+                            bestTranscript = result[j].transcript;
+                            bestConfidence = result[j].confidence;
+                        }
+                    }
+                    
+                    if (result.isFinal) {
+                        finalTranscript += bestTranscript + ' ';
+                        console.log('✓ Final transcript:', bestTranscript, 'Confidence:', bestConfidence);
                     } else {
-                        interimTranscript += transcript;
+                        interimTranscript += bestTranscript;
                     }
                 }
 
                 // Update interim transcript for live display
-                setInterimTranscript(interimTranscript);
+                if (interimTranscript) {
+                    setInterimTranscript(interimTranscript);
+                }
 
                 // Add final transcript to the main transcript
-                if (finalTranscript) {
+                if (finalTranscript.trim()) {
                     setTranscript(prev => {
                         const newTranscript = prev + finalTranscript;
-                        console.log('New transcript:', newTranscript);
+                        console.log('📝 Updated transcript length:', newTranscript.length, 'words:', newTranscript.split(' ').length);
                         return newTranscript;
                     });
                     setInterimTranscript(''); // Clear interim when we have final
                 }
             };
 
+            recognition.onaudiostart = () => {
+                console.log('🎙️ Audio capture started');
+            };
+
+            recognition.onaudioend = () => {
+                console.log('🎙️ Audio capture ended');
+            };
+
+            recognition.onsoundstart = () => {
+                console.log('🔊 Sound detected');
+            };
+
+            recognition.onsoundend = () => {
+                console.log('🔇 Sound ended');
+            };
+
+            recognition.onspeechstart = () => {
+                console.log('🗣️ Speech started');
+            };
+
+            recognition.onspeechend = () => {
+                console.log('🗣️ Speech ended');
+            };
+
             recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                setIsTranscribing(false);
+                console.error('❌ Speech recognition error:', event.error);
                 
                 if (event.error === 'no-speech') {
-                    console.log('No speech detected, continuing...');
+                    console.log('⏸️ No speech detected, will continue listening...');
                     // Don't show error for no-speech, just continue
-                } else if (event.error === 'network') {
-                    setError('Network error during speech recognition. Please check your connection.');
+                } else if (event.error === 'audio-capture') {
+                    console.error('Microphone not accessible');
+                    setError('Microphone not accessible. Please check your microphone connection.');
+                    setIsTranscribing(false);
                 } else if (event.error === 'not-allowed') {
+                    console.error('Microphone permission denied');
                     setError('Microphone access denied. Please allow microphone access for transcription.');
+                    setIsTranscribing(false);
+                    isManualStop = true;
+                } else if (event.error === 'network') {
+                    console.error('Network error');
+                    // Network errors are common, just restart
+                } else if (event.error === 'aborted') {
+                    console.log('Recognition aborted, will restart if needed');
                 } else {
-                    setError(`Speech recognition error: ${event.error}`);
+                    console.error('Other error:', event.error);
                 }
             };
 
             recognition.onend = () => {
-                console.log('Speech recognition ended');
-                setIsTranscribing(false);
+                console.log('🛑 Speech recognition ended');
                 setInterimTranscript('');
                 
-                // Restart recognition if still recording
-                if (isRecording) {
-                    console.log('Restarting speech recognition...');
-                    setTimeout(() => {
-                        if (isRecording && recognitionRef.current) {
-                            recognition.start();
+                // Clear any pending restart
+                if (restartTimeout) {
+                    clearTimeout(restartTimeout);
+                }
+                
+                // Restart recognition if still recording and not manually stopped
+                if (isRecording && !isManualStop && recognitionRef.current === recognition) {
+                    console.log('🔄 Auto-restarting speech recognition...');
+                    restartTimeout = setTimeout(() => {
+                        try {
+                            if (isRecording && recognitionRef.current === recognition) {
+                                recognition.start();
+                            }
+                        } catch (err) {
+                            console.error('Error restarting recognition:', err);
+                            setIsTranscribing(false);
                         }
-                    }, 100);
+                    }, 300); // Slightly longer delay for stability
+                } else {
+                    setIsTranscribing(false);
+                    console.log('Not restarting - isRecording:', isRecording, 'isManualStop:', isManualStop);
                 }
             };
 
-            recognition.start();
-            recognitionRef.current = recognition;
+            try {
+                recognition.start();
+                recognitionRef.current = recognition;
+                console.log('🚀 Starting speech recognition...');
+            } catch (err) {
+                console.error('Error starting recognition:', err);
+                throw err;
+            }
             
         } catch (err) {
-            console.error('Failed to start speech recognition:', err);
+            console.error('Failed to initialize speech recognition:', err);
             setError('Failed to start speech recognition: ' + err.message);
             setSpeechSupported(false);
+            setIsTranscribing(false);
         }
-    };
+    }, [isRecording]);
 
-    const stopSpeechRecognition = () => {
+    const stopSpeechRecognition = useCallback(() => {
         if (recognitionRef.current) {
-            console.log('Stopping speech recognition');
-            recognitionRef.current.stop();
+            console.log('🛑 Manually stopping speech recognition');
+            try {
+                recognitionRef.current.stop();
+            } catch (err) {
+                console.error('Error stopping recognition:', err);
+            }
             recognitionRef.current = null;
             setIsTranscribing(false);
             setInterimTranscript('');
         }
-    };
+    }, []);
 
     // Check camera permission and speech support on component mount
     useEffect(() => {
@@ -313,29 +516,34 @@ export default function InterviewPage() {
             
             mediaRecorder.start(1000); // Collect data every second
             
-            // Start speech recognition for live transcription
+            // Start Web Speech API for live transcription
             if (speechSupported) {
-                startSpeechRecognition();
+                console.log('🎤 Starting Web Speech API for transcription...');
+                setTimeout(() => {
+                    startSpeechRecognition();
+                }, 500); // Small delay to ensure recording is fully started
             } else {
-                console.log('Speech recognition not supported, recording without transcription');
+                console.log('⚠️ Speech recognition not supported, recording without transcription');
+                setError('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');
             }
             
         } catch (err) {
             console.error("Failed to start recording:", err);
             setError("Failed to start recording: " + err.message);
         }
-    }, [webcamRef, handleDataAvailable, permissionGranted]);
+    }, [webcamRef, handleDataAvailable, permissionGranted, speechSupported, startSpeechRecognition]);
 
     const stopRecording = useCallback(() => {
-        if (mediaRecorderRef.current && isRecording) {
-            console.log('Stopping recording...');
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            console.log('🛑 Stopping recording...');
             mediaRecorderRef.current.stop();
             setIsRecording(false);
             
-            // Stop speech recognition
+            // Stop Web Speech API
+            console.log('🛑 Stopping Web Speech API...');
             stopSpeechRecognition();
         }
-    }, [mediaRecorderRef, isRecording]);
+    }, [stopSpeechRecognition]);
 
 
 
@@ -372,9 +580,22 @@ export default function InterviewPage() {
         }
     };
 
+    const saveCurrentAnswer = () => {
+        // Save the current transcript as the answer for the current question
+        const updatedAnswers = [...questionAnswers];
+        updatedAnswers[currentQuestionIndex] = transcript;
+        setQuestionAnswers(updatedAnswers);
+    };
+
     const analyzeInterview = async () => {
-        if (!transcript.trim() && !videoBlob) {
-            setError('No content to analyze. Please record an interview first.');
+        // Save the last answer before analyzing
+        saveCurrentAnswer();
+        
+        const finalAnswers = [...questionAnswers];
+        finalAnswers[currentQuestionIndex] = transcript;
+        
+        if (finalAnswers.filter(a => a && a.trim()).length === 0) {
+            setError('No answers recorded. Please answer at least one question.');
             return;
         }
 
@@ -382,45 +603,77 @@ export default function InterviewPage() {
         setError(null);
 
         try {
-            // Create FormData to send both transcript and video
-            const formData = new FormData();
-            formData.append('transcript', transcript);
-            formData.append('userId', params.id);
-            formData.append('questions', JSON.stringify(interviewQuestions));
-            
-            if (videoBlob) {
-                formData.append('video', videoBlob, `interview-${params.id}-${Date.now()}.webm`);
-            }
-
-            const response = await fetch('/api/interview', {
+            // Use the new evaluation API
+            const response = await fetch('/api/interview/evaluate', {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    answers: finalAnswers,
+                    selectedSkills: selectedSkills,
+                    questions: interviewQuestions
+                }),
             });
 
             if (!response.ok) {
-                throw new Error('Analysis failed');
+                throw new Error('Evaluation failed');
             }
 
             const result = await response.json();
-            setAnalysis(result);
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Evaluation failed');
+            }
+            
+            setAnalysis(result.data);
 
             // Save to Firebase
             if (db) {
                 await addDoc(collection(db, "interviews"), {
                     userId: params.id,
-                    transcript,
-                    analysis: result,
+                    answers: finalAnswers,
                     questions: interviewQuestions,
+                    selectedSkills: selectedSkills,
+                    evaluation: result.data,
                     createdAt: serverTimestamp(),
                 });
             }
 
             setSessionComplete(true);
         } catch (err) {
+            console.error('Analysis error:', err);
             setError('Failed to analyze interview: ' + err.message);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const toggleSkillSelection = (skillId) => {
+        setSelectedSkills(prev => {
+            if (prev.includes(skillId)) {
+                return prev.filter(id => id !== skillId);
+            } else {
+                return [...prev, skillId];
+            }
+        });
+    };
+
+    const generateQuestions = () => {
+        if (selectedSkills.length === 0) {
+            setError('Please select at least one skill or role');
+            return;
+        }
+
+        const questions = [];
+        selectedSkills.forEach(skillId => {
+            const skillQs = skillQuestions[skillId] || [];
+            questions.push(...skillQs);
+        });
+
+        setInterviewQuestions(questions);
+        setShowSkillSelection(false);
+        setError(null);
     };
 
     const startNewSession = () => {
@@ -432,6 +685,10 @@ export default function InterviewPage() {
         setRecordedChunks([]);
         setCurrentQuestionIndex(0);
         setError(null);
+        setSelectedSkills([]);
+        setShowSkillSelection(true);
+        setInterviewQuestions([]);
+        setQuestionAnswers([]);
     };
 
     const stopSession = () => {
@@ -462,13 +719,21 @@ export default function InterviewPage() {
 
     const nextQuestion = () => {
         if (currentQuestionIndex < interviewQuestions.length - 1) {
+            // Save current answer before moving to next question
+            saveCurrentAnswer();
             setCurrentQuestionIndex(currentQuestionIndex + 1);
+            // Load the next question's answer if it exists
+            setTranscript(questionAnswers[currentQuestionIndex + 1] || '');
         }
     };
 
     const prevQuestion = () => {
         if (currentQuestionIndex > 0) {
+            // Save current answer before moving to previous question
+            saveCurrentAnswer();
             setCurrentQuestionIndex(currentQuestionIndex - 1);
+            // Load the previous question's answer
+            setTranscript(questionAnswers[currentQuestionIndex - 1] || '');
         }
     };
 
@@ -532,73 +797,177 @@ export default function InterviewPage() {
                 )}
 
                 {!sessionStarted && !sessionComplete && (
-                    <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-                        <h2 className="text-gray-900 text-2xl font-semibold mb-4">Welcome to AI Interview Practice</h2>
-                        <p className="text-gray-900 mb-6">
-                            This session will record your video responses to common interview questions. 
+                    <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+                        <h2 className="text-gray-900 text-2xl font-semibold mb-4 text-center">Welcome to AI Interview Practice</h2>
+                        <p className="text-gray-900 mb-6 text-center">
+                            This session will record your video responses to interview questions based on your selected skills. 
                             Your performance will be analyzed and rated based on communication skills, 
                             confidence, and content quality.
                         </p>
-                        <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                            <h3 className="font-semibold text-gray-900 mb-2">You'll be asked {interviewQuestions.length} questions:</h3>
-                            <ul className="text-left text-gray-900 text-sm space-y-1">
-                                {interviewQuestions.map((question, index) => (
-                                    <li key={index} className="flex items-start space-x-2">
-                                        <span className="text-blue-600 font-semibold">{index + 1}.</span>
-                                        <span>{question}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        
-                        <div className="bg-yellow-50 p-4 rounded-lg mb-6">
-                            <div className="flex items-center space-x-2">
-                                <IconAlertCircle className="text-yellow-600" size={20} />
-                                <div>
-                                    <h4 className="font-semibold text-yellow-800">Camera & Microphone Access Required</h4>
-                                    <p className="text-yellow-700 text-sm mb-2">
-                                        This interview session requires camera and microphone access to record your responses and provide live transcription. 
-                                        Please allow access when prompted by your browser.
+
+                        {showSkillSelection ? (
+                            <>
+                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg mb-6">
+                                    <h3 className="font-semibold text-gray-900 mb-3 text-lg">Select Skills & Roles</h3>
+                                    <p className="text-gray-700 text-sm mb-4">
+                                        Choose the skills or roles you want to practice. Each selection adds 5 unique questions.
+                                        <span className="block mt-1 text-blue-600 font-medium">
+                                            Selected: {selectedSkills.length} ({selectedSkills.length * 5} questions)
+                                        </span>
                                     </p>
-                                    <div className="flex items-center space-x-4 text-xs">
-                                        <div className="flex items-center space-x-1">
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                            <span>Video Recording</span>
-                                        </div>
-                                        <div className="flex items-center space-x-1">
-                                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                            <span>Live Transcription</span>
-                                        </div>
-                                        <div className="flex items-center space-x-1">
-                                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                            <span>AI Analysis</span>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                        {availableSkills.map(skill => {
+                                            const isSelected = selectedSkills.includes(skill.id);
+                                            const colorClasses = {
+                                                yellow: isSelected 
+                                                    ? 'bg-gradient-to-br from-yellow-500 to-amber-600 text-white shadow-lg ring-2 ring-yellow-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50',
+                                                blue: isSelected 
+                                                    ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg ring-2 ring-blue-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50',
+                                                green: isSelected 
+                                                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg ring-2 ring-green-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-green-400 hover:bg-green-50',
+                                                indigo: isSelected 
+                                                    ? 'bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-lg ring-2 ring-indigo-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50',
+                                                red: isSelected 
+                                                    ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-lg ring-2 ring-red-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-red-400 hover:bg-red-50',
+                                                purple: isSelected 
+                                                    ? 'bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg ring-2 ring-purple-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50',
+                                                pink: isSelected 
+                                                    ? 'bg-gradient-to-br from-pink-500 to-rose-600 text-white shadow-lg ring-2 ring-pink-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-pink-400 hover:bg-pink-50',
+                                                emerald: isSelected 
+                                                    ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg ring-2 ring-emerald-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-emerald-400 hover:bg-emerald-50',
+                                                violet: isSelected 
+                                                    ? 'bg-gradient-to-br from-violet-500 to-purple-700 text-white shadow-lg ring-2 ring-violet-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-violet-400 hover:bg-violet-50',
+                                                orange: isSelected 
+                                                    ? 'bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-lg ring-2 ring-orange-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50',
+                                                cyan: isSelected 
+                                                    ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg ring-2 ring-cyan-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-cyan-400 hover:bg-cyan-50',
+                                                teal: isSelected 
+                                                    ? 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-lg ring-2 ring-teal-400' 
+                                                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-teal-400 hover:bg-teal-50'
+                                            };
+                                            
+                                            return (
+                                                <button
+                                                    key={skill.id}
+                                                    onClick={() => toggleSkillSelection(skill.id)}
+                                                    className={`px-4 py-3 rounded-lg font-medium transition-all transform hover:scale-105 ${colorClasses[skill.color]}`}
+                                                >
+                                                    {skill.name}
+                                                    {isSelected && (
+                                                        <span className="ml-2">✓</span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {selectedSkills.length > 0 && (
+                                    <div className="text-center mb-6">
+                                        <button
+                                            onClick={generateQuestions}
+                                            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg font-semibold text-lg"
+                                        >
+                                            Generate {selectedSkills.length * 5} Questions
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg mb-6 text-center">
+                                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900 mb-2 text-xl">Questions Generated!</h3>
+                                    <p className="text-gray-700 text-lg mb-1">
+                                        {interviewQuestions.length} questions ready for your interview
+                                    </p>
+                                    <p className="text-gray-600 text-sm">
+                                        Questions will be shown one at a time during the session
+                                    </p>
+                                </div>
+                                <div className="text-center mb-6">
+                                    <button
+                                        onClick={() => {
+                                            setShowSkillSelection(true);
+                                            setInterviewQuestions([]);
+                                        }}
+                                        className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                                    >
+                                        ← Change Skills Selection
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                        
+                        {!showSkillSelection && (
+                            <>
+                                <div className="bg-yellow-50 p-4 rounded-lg mb-6">
+                                    <div className="flex items-center space-x-2">
+                                        <IconAlertCircle className="text-yellow-600" size={20} />
+                                        <div>
+                                            <h4 className="font-semibold text-yellow-800">Camera & Microphone Access Required</h4>
+                                            <p className="text-yellow-700 text-sm mb-2">
+                                                This interview session requires camera and microphone access to record your responses and provide live transcription. 
+                                                Please allow access when prompted by your browser.
+                                            </p>
+                                            <div className="flex text-black items-center space-x-4 text-xs">
+                                                <div className="flex items-center space-x-1">
+                                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                    <span>Video Recording</span>
+                                                </div>
+                                                <div className="flex items-center space-x-1">
+                                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                    <span>Live Transcription</span>
+                                                </div>
+                                                <div className="flex items-center space-x-1">
+                                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                                    <span>AI Analysis</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <button
-                            onClick={async () => {
-                                const permissionGranted = await requestCameraPermission();
-                                if (permissionGranted) {
-                                    setSessionStarted(true);
-                                }
-                            }}
-                            disabled={requestingPermission}
-                            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold flex items-center space-x-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {requestingPermission ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                    <span>Requesting Camera Access...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <IconPlayerPlay size={20} />
-                                    <span>Start Interview Session</span>
-                                </>
-                            )}
-                        </button>
+                                <div className="text-center">
+                                    <button
+                                        onClick={async () => {
+                                            const permissionGranted = await requestCameraPermission();
+                                            if (permissionGranted) {
+                                                setSessionStarted(true);
+                                            }
+                                        }}
+                                        disabled={requestingPermission}
+                                        className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold inline-flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {requestingPermission ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                <span>Requesting Camera Access...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <IconPlayerPlay size={20} />
+                                                <span>Start Interview Session</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </>
+                        )}
                         
                         {cameraError && (
                             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -772,12 +1141,37 @@ export default function InterviewPage() {
                                     </button>
                                 )}
                             </div>
+                            
+                            {/* Speech Recognition Test */}
+                            {!isRecording && speechSupported && (
+                                <div className="mt-4 text-center">
+                                    <button
+                                        onClick={() => {
+                                            if (isTranscribing) {
+                                                stopSpeechRecognition();
+                                            } else {
+                                                startSpeechRecognition();
+                                            }
+                                        }}
+                                        className={`text-sm px-4 py-2 rounded-lg transition-colors ${
+                                            isTranscribing 
+                                                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                                                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                        }`}
+                                    >
+                                        {isTranscribing ? '🛑 Stop Test' : '🎤 Test Speech Recognition'}
+                                    </button>
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Test Web Speech API before recording
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Live Transcript Section */}
                         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-black text-lg font-semibold">Live Transcript</h3>
+                                <h3 className="text-black text-lg font-semibold">Live Transcript (Web Speech API)</h3>
                                 <div className="flex items-center space-x-2">
                                     {isTranscribing && (
                                         <div className="flex items-center space-x-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
@@ -870,55 +1264,204 @@ export default function InterviewPage() {
                 )}
 
                 {/* Analysis Results */}
-                {sessionComplete && analysis && (
-                    <div className="bg-white rounded-lg border border-gray-200 p-6">
-                        <div className="text-center mb-6">
-                            <h2 className="text-2xl font-bold text-green-600 mb-2">Interview Complete!</h2>
-                            <p className="text-gray-600">Here's your performance analysis:</p>
-                        </div>
+                {sessionComplete && analysis && analysis.performance && (
+                    <div className="space-y-6">
+                        {/* Overall Score Card */}
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl border border-green-200 p-8">
+                            <div className="text-center mb-6">
+                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Interview Complete! 🎉</h2>
+                                <p className="text-gray-600">Here's your detailed performance analysis</p>
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div className="text-center p-4 bg-blue-50 rounded-lg">
-                                <h3 className="font-semibold text-blue-800">Overall Score</h3>
-                                <div className="text-3xl font-bold text-blue-600 mt-2">
-                                    {analysis.overallScore || 'N/A'}/10
-                                </div>
-                            </div>
-                            <div className="text-center p-4 bg-green-50 rounded-lg">
-                                <h3 className="font-semibold text-green-800">Communication</h3>
-                                <div className="text-3xl font-bold text-green-600 mt-2">
-                                    {analysis.communicationScore || 'N/A'}/10
-                                </div>
-                            </div>
-                            <div className="text-center p-4 bg-purple-50 rounded-lg">
-                                <h3 className="font-semibold text-purple-800">Confidence</h3>
-                                <div className="text-3xl font-bold text-purple-600 mt-2">
-                                    {analysis.confidenceScore || 'N/A'}/10
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                            <h3 className="font-semibold mb-4">Detailed Feedback</h3>
-                            <div className="space-y-4">
-                                {analysis.feedback ? (
-                                    <div className="prose max-w-none">
-                                        <p>{analysis.feedback}</p>
+                            <div className="flex justify-center mb-6">
+                                <div className="text-center">
+                                    <div className="text-6xl font-bold text-green-600 mb-2">
+                                        {analysis.performance.overallScore}/10
                                     </div>
-                                ) : (
-                                    <pre className="whitespace-pre-wrap text-sm">
-                                        {JSON.stringify(analysis, null, 2)}
-                                    </pre>
-                                )}
+                                    <p className="text-gray-700 font-medium">Overall Score</p>
+                                    <p className="text-sm text-gray-500">{analysis.performance.totalQuestions} questions answered</p>
+                                </div>
                             </div>
                         </div>
 
+                        {/* Skill Breakdown */}
+                        <div className="bg-white rounded-3xl border border-gray-200 p-8">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-6">Performance by Skill</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {Object.entries(analysis.performance.skillDetails).map(([skill, details]) => (
+                                    <div key={skill} className={`p-4 rounded-lg border-2 ${
+                                        details.category === 'best' ? 'bg-green-50 border-green-300' :
+                                        details.category === 'good' ? 'bg-blue-50 border-blue-300' :
+                                        'bg-orange-50 border-orange-300'
+                                    }`}>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h4 className="font-semibold text-gray-900 capitalize">{skill}</h4>
+                                            <span className={`text-2xl font-bold ${
+                                                details.category === 'best' ? 'text-green-600' :
+                                                details.category === 'good' ? 'text-blue-600' :
+                                                'text-orange-600'
+                                            }`}>
+                                                {details.averageScore}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            {details.totalQuestions} question{details.totalQuestions !== 1 ? 's' : ''}
+                                        </div>
+                                        {details.needsImprovement && (
+                                            <div className="mt-2 text-xs text-orange-700 font-medium">
+                                                ⚠️ Needs improvement
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Strengths and Weaknesses */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {analysis.performance.strengths.length > 0 && (
+                                <div className="bg-green-50 rounded-2xl border border-green-200 p-6">
+                                    <h3 className="text-xl font-bold text-green-800 mb-4">💪 Your Strengths</h3>
+                                    <ul className="space-y-2">
+                                        {analysis.performance.strengths.map((skill, index) => (
+                                            <li key={index} className="flex items-center space-x-2 text-green-700">
+                                                <span className="text-green-500">✓</span>
+                                                <span className="capitalize font-medium">{skill}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {analysis.performance.weaknesses.length > 0 && (
+                                <div className="bg-orange-50 rounded-2xl border border-orange-200 p-6">
+                                    <h3 className="text-xl font-bold text-orange-800 mb-4">📚 Areas to Improve</h3>
+                                    <ul className="space-y-2">
+                                        {analysis.performance.weaknesses.map((skill, index) => (
+                                            <li key={index} className="flex items-center space-x-2 text-orange-700">
+                                                <span className="text-orange-500">→</span>
+                                                <span className="capitalize font-medium">{skill}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Recommendations */}
+                        {analysis.performance.recommendations && analysis.performance.recommendations.length > 0 && (
+                            <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
+                                <h3 className="text-xl font-bold text-blue-800 mb-4">💡 Recommendations</h3>
+                                <div className="space-y-3">
+                                    {analysis.performance.recommendations.map((rec, index) => (
+                                        <div key={index} className="bg-white rounded-lg p-4 border border-blue-100">
+                                            <p className="text-gray-800">{rec.message}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Question-by-Question Breakdown with Answers */}
+                        <div className="bg-white rounded-3xl border border-gray-200 p-8">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-6">📝 Your Answers & Analysis</h3>
+                            <div className="space-y-6">
+                                {analysis.evaluations && analysis.evaluations.map((evaluation, index) => (
+                                    <div key={index} className="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-300 transition-colors">
+                                        {/* Question Header */}
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center space-x-2 mb-2">
+                                                    <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                                                        Q{index + 1}
+                                                    </span>
+                                                    <span className="text-xs text-gray-500 capitalize">
+                                                        {evaluation.skill}
+                                                    </span>
+                                                </div>
+                                                <h4 className="font-semibold text-gray-900 text-lg">{evaluation.question}</h4>
+                                            </div>
+                                            <span className={`ml-4 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap ${
+                                                evaluation.category === 'best' ? 'bg-green-100 text-green-700' :
+                                                evaluation.category === 'good' ? 'bg-blue-100 text-blue-700' :
+                                                evaluation.category === 'insufficient' ? 'bg-red-100 text-red-700' :
+                                                'bg-orange-100 text-orange-700'
+                                            }`}>
+                                                {evaluation.score}/10
+                                            </span>
+                                        </div>
+
+                                        {/* User's Answer */}
+                                        <div className="mb-4">
+                                            <div className="flex items-center space-x-2 mb-2">
+                                                <span className="text-sm font-semibold text-gray-700">Your Answer:</span>
+                                                <span className="text-xs text-gray-500">
+                                                    ({evaluation.userAnswer ? evaluation.userAnswer.split(' ').filter(w => w.length > 0).length : 0} words)
+                                                </span>
+                                            </div>
+                                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                                {evaluation.userAnswer && evaluation.userAnswer.trim() ? (
+                                                    <p className="text-gray-800 whitespace-pre-wrap">{evaluation.userAnswer}</p>
+                                                ) : (
+                                                    <p className="text-gray-400 italic">No answer provided</p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Evaluation Feedback */}
+                                        <div className="mb-3">
+                                            <span className="text-sm font-semibold text-gray-700 block mb-2">Feedback:</span>
+                                            <p className="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                                {evaluation.feedback}
+                                            </p>
+                                        </div>
+
+                                        {/* Keywords Matched */}
+                                        {evaluation.matchedKeywords && evaluation.matchedKeywords.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 items-center">
+                                                <span className="text-xs font-semibold text-gray-600">✓ Keywords covered:</span>
+                                                {evaluation.matchedKeywords.map((keyword, kidx) => (
+                                                    <span key={kidx} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
+                                                        {keyword}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Performance Category Badge */}
+                                        <div className="mt-3 pt-3 border-t border-gray-200">
+                                            <span className="text-xs text-gray-500">
+                                                Performance Level: 
+                                                <span className={`ml-2 font-semibold ${
+                                                    evaluation.category === 'best' ? 'text-green-600' :
+                                                    evaluation.category === 'good' ? 'text-blue-600' :
+                                                    evaluation.category === 'insufficient' ? 'text-red-600' :
+                                                    'text-orange-600'
+                                                }`}>
+                                                    {evaluation.category === 'best' ? '🌟 Excellent' :
+                                                     evaluation.category === 'good' ? '👍 Good' :
+                                                     evaluation.category === 'insufficient' ? '❌ Insufficient' :
+                                                     '📖 Basic'}
+                                                </span>
+                                                {evaluation.matchPercentage !== undefined && (
+                                                    <span className="ml-2">
+                                                        ({Math.round(evaluation.matchPercentage)}% keyword match)
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Action Button */}
                         <div className="text-center">
                             <button
                                 onClick={startNewSession}
-                                className="flex items-center space-x-2 mx-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                                className="flex items-center space-x-2 mx-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg font-semibold text-lg"
                             >
-                                <IconRotateClockwise size={20} />
+                                <IconRotateClockwise size={24} />
                                 <span>Start New Interview</span>
                             </button>
                         </div>

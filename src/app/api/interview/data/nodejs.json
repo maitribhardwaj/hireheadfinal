@@ -1,0 +1,110 @@
+{
+  "skill": "nodejs",
+  "questions": [
+    {
+      "id": "node_1",
+      "question": "What is Node.js and how does it differ from browser JavaScript?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["runtime", "server", "javascript", "v8", "backend"],
+          "description": "Basic Node.js understanding"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["runtime environment", "v8 engine", "event-driven", "non-blocking", "server-side", "modules", "npm", "file system", "no DOM"],
+          "description": "Good understanding of Node.js architecture"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["runtime environment", "v8 engine", "libuv", "event-driven architecture", "non-blocking I/O", "single-threaded", "event loop", "worker threads", "cluster", "modules", "CommonJS", "ES modules", "global objects", "process", "buffer"],
+          "description": "Comprehensive Node.js knowledge"
+        }
+      }
+    },
+    {
+      "id": "node_2",
+      "question": "Explain the event-driven architecture of Node.js.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["events", "callback", "asynchronous", "listener", "emit"],
+          "description": "Basic event-driven concept"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["event emitter", "event loop", "callback", "asynchronous", "non-blocking", "listeners", "emit", "on", "once", "event queue"],
+          "description": "Good understanding of event system"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["EventEmitter", "event loop", "callback queue", "microtask queue", "phases", "timers", "I/O callbacks", "idle", "poll", "check", "close callbacks", "setImmediate", "process.nextTick", "libuv", "non-blocking I/O"],
+          "description": "Expert level event-driven architecture"
+        }
+      }
+    },
+    {
+      "id": "node_3",
+      "question": "What are streams in Node.js and when would you use them?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["stream", "data", "chunks", "readable", "writable"],
+          "description": "Basic streams awareness"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["readable stream", "writable stream", "duplex", "transform", "pipe", "chunks", "memory efficient", "backpressure", "events"],
+          "description": "Good streams understanding"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["readable stream", "writable stream", "duplex stream", "transform stream", "pipe", "pipeline", "chunks", "backpressure", "highWaterMark", "object mode", "events", "error handling", "memory efficiency", "large files", "real-time data"],
+          "description": "Comprehensive streams mastery"
+        }
+      }
+    },
+    {
+      "id": "node_4",
+      "question": "How do you handle errors in Node.js applications?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["try catch", "error", "callback", "throw", "catch"],
+          "description": "Basic error handling"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["try catch", "error-first callback", "promise rejection", "async await", "error event", "uncaughtException", "unhandledRejection", "error middleware"],
+          "description": "Good error handling practices"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["try catch", "error-first callback", "promise rejection", "async await", "error propagation", "custom errors", "error middleware", "uncaughtException", "unhandledRejection", "process.on", "domain", "error logging", "graceful shutdown", "operational vs programmer errors"],
+          "description": "Expert error handling strategies"
+        }
+      }
+    },
+    {
+      "id": "node_5",
+      "question": "Explain middleware in Express.js.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["middleware", "function", "request", "response", "next"],
+          "description": "Basic middleware concept"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["middleware", "request", "response", "next", "chain", "app.use", "router", "error handling", "built-in", "third-party", "custom"],
+          "description": "Good middleware understanding"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["middleware stack", "request", "response", "next function", "application-level", "router-level", "error-handling middleware", "built-in middleware", "third-party", "custom middleware", "order of execution", "body-parser", "cors", "authentication", "logging"],
+          "description": "Comprehensive middleware expertise"
+        }
+      }
+    }
+  ]
+}

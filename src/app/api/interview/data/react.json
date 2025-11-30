@@ -1,0 +1,110 @@
+{
+  "skill": "javascript",
+  "questions": [
+    {
+      "id": "js_1",
+      "question": "Explain the difference between let, const, and var in JavaScript.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["var", "let", "const", "scope", "hoisting", "reassign"],
+          "description": "Basic understanding of variable declarations"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["block scope", "function scope", "temporal dead zone", "hoisting", "reassignment", "redeclaration", "global scope"],
+          "description": "Good understanding with scope concepts"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["block scope", "function scope", "temporal dead zone", "hoisting", "lexical scope", "memory", "const immutability", "reference vs primitive", "use strict", "best practices"],
+          "description": "Comprehensive understanding with best practices"
+        }
+      }
+    },
+    {
+      "id": "js_2",
+      "question": "What are closures in JavaScript and how do you use them?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["function", "inner function", "outer function", "variable", "access"],
+          "description": "Basic closure concept"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["lexical scope", "private variables", "encapsulation", "callback", "memory", "scope chain", "nested function"],
+          "description": "Good understanding of closure mechanics"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["lexical environment", "scope chain", "private variables", "data encapsulation", "factory functions", "module pattern", "memory management", "garbage collection", "practical use cases", "currying"],
+          "description": "Expert level with practical applications"
+        }
+      }
+    },
+    {
+      "id": "js_3",
+      "question": "Describe the event loop in JavaScript.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["asynchronous", "callback", "queue", "stack", "single threaded"],
+          "description": "Basic async understanding"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["call stack", "callback queue", "event queue", "web apis", "microtask", "macrotask", "non-blocking", "concurrency model"],
+          "description": "Good understanding of event loop mechanics"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["call stack", "heap", "callback queue", "microtask queue", "macrotask queue", "web apis", "event loop phases", "promise", "async await", "requestAnimationFrame", "setImmediate", "process.nextTick", "execution context"],
+          "description": "Deep understanding with execution details"
+        }
+      }
+    },
+    {
+      "id": "js_4",
+      "question": "What is the difference between == and === in JavaScript?",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["equality", "strict", "type", "comparison", "coercion"],
+          "description": "Basic comparison understanding"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["type coercion", "strict equality", "loose equality", "type conversion", "falsy values", "truthy values", "best practices"],
+          "description": "Good understanding with type coercion"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["type coercion", "strict equality", "abstract equality", "type conversion algorithm", "falsy values", "truthy values", "Object.is", "NaN comparison", "null vs undefined", "performance", "best practices", "linting rules"],
+          "description": "Comprehensive with edge cases and alternatives"
+        }
+      }
+    },
+    {
+      "id": "js_5",
+      "question": "Explain promises and async/await in JavaScript.",
+      "answers": {
+        "notBad": {
+          "score": 5,
+          "keywords": ["promise", "async", "await", "then", "catch", "asynchronous"],
+          "description": "Basic promise understanding"
+        },
+        "good": {
+          "score": 7,
+          "keywords": ["promise chain", "resolve", "reject", "pending", "fulfilled", "rejected", "error handling", "try catch", "async function", "await keyword"],
+          "description": "Good understanding of promise states and async/await"
+        },
+        "best": {
+          "score": 10,
+          "keywords": ["promise states", "microtask queue", "promise chaining", "promise.all", "promise.race", "promise.allSettled", "promise.any", "error propagation", "async function", "await", "top-level await", "error handling", "performance", "parallel execution", "sequential execution"],
+          "description": "Expert level with advanced patterns and methods"
+        }
+      }
+    }
+  ]
+}
