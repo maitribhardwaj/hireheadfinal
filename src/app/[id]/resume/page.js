@@ -140,7 +140,7 @@ export default function ResumePage() {
                         >
                             <IconArrowLeft size={20} />
                         </button>
-                        <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <div className="w-10 h-10 bg-green-400 rounded-xl flex items-center justify-center shadow-lg">
                             <IconFileText className="text-white" size={24} />
                         </div>
                         <div>
@@ -157,7 +157,7 @@ export default function ResumePage() {
 
                 {/* Upload Section */}
                 <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Upload Resume</h2>
+                    <h2 className="text-xl font-extrabold text-gray-800 mb-4">Upload Resume</h2>
                     
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                         <IconFileText className="mx-auto text-gray-400 mb-4" size={48} />
@@ -176,7 +176,7 @@ export default function ResumePage() {
                                 />
                                 <label
                                     htmlFor="resume-upload"
-                                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer inline-flex items-center space-x-2"
+                                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors cursor-pointer inline-flex items-center space-x-2"
                                 >
                                     <IconUpload size={18} />
                                     <span>Choose File</span>

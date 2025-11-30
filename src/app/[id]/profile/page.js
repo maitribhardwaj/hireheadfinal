@@ -417,7 +417,7 @@ export default function ProfilePage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex items-center space-x-4">
-                            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-lg">
                                 <IconUser className="text-white" size={24} />
                             </div>
                             <div>
@@ -434,14 +434,14 @@ export default function ProfilePage() {
                                 <>
                                     <button
                                         onClick={handleExportClick}
-                                        className="group flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-2.5 rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
+                                        className="group flex items-center space-x-2 bg-black text-white px-4 py-2.5 rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
                                     >
                                         <IconDownload size={16} className="group-hover:scale-110 transition-transform" />
                                         <span>Export PDF</span>
                                     </button>
                                     <button
                                         onClick={startEditing}
-                                        className="group flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2.5 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
+                                        className="group flex items-center space-x-2 bg-black text-white px-4 py-2.5 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm font-medium"
                                     >
                                         <IconEdit size={16} className="group-hover:scale-110 transition-transform" />
                                         <span>Edit Profile</span>
@@ -729,13 +729,13 @@ export default function ProfilePage() {
                             <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-4">
                                 <h3 className="font-medium text-gray-900 text-sm mb-3">Actions</h3>
                                 <div className="space-y-2">
-                                    <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 text-xs font-medium">
+                                    <button className="w-full bg-blue-300 text-black px-3 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 text-xs font-medium">
                                         Dashboard
                                     </button>
-                                    <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 text-xs font-medium">
+                                    <button className="w-full bg-pink-300  text-black px-3 py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 text-xs font-medium">
                                         Jobs
                                     </button>
-                                    <button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 text-xs font-medium">
+                                    <button className="w-full bg-green-300 text-black px-3 py-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 text-xs font-medium">
                                         Resume
                                     </button>
                                 </div>

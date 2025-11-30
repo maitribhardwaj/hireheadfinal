@@ -349,7 +349,7 @@ export default function JobsPage() {
 
                 {/* Compact Match Analysis */}
                 {showMatchScore && matchData.details && (
-                    <div className="mb-3 p-2 bg-blue-50 rounded border border-blue-100">
+                    <div className="mb-3 p-2 bg-pink-50 rounded border border-blue-100">
                         <div className="flex justify-between items-center mb-2">
                             <span className="text-xs font-medium text-blue-900">Match Analysis</span>
                             <div className="flex gap-1 text-xs">
@@ -515,7 +515,7 @@ export default function JobsPage() {
                     </div>
                     <button 
                         onClick={() => job.applyUrl ? window.open(job.applyUrl, '_blank') : null}
-                        className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium flex items-center space-x-1"
+                        className="bg-pink-400 text-white px-3 py-1.5 rounded-lg hover:bg-pink-500 transition-colors text-xs font-medium flex items-center space-x-1"
                     >
                         <span>Apply</span>
                         <IconExternalLink size={12} />
@@ -546,7 +546,7 @@ export default function JobsPage() {
             <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
                     <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <div className="w-10 h-10 bg-pink-300 from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
                             <IconBriefcase className="text-white" size={24} />
                         </div>
                         <div>
@@ -599,7 +599,7 @@ export default function JobsPage() {
                         {/* Search Button */}
                         <button
                             type="submit"
-                            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2"
+                            className="bg-pink-400 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2"
                         >
                             <IconSearch size={16} />
                             <span>Search</span>
@@ -633,7 +633,7 @@ export default function JobsPage() {
                                 onClick={() => setActiveTab('all')}
                                 className={`relative flex-1 py-4 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
                                     activeTab === 'all'
-                                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg transform scale-105'
+                                        ? 'bg-pink-300 text-white shadow-lg transform scale-105'
                                         : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                             >
@@ -649,7 +649,7 @@ export default function JobsPage() {
                                     </div>
                                 </div>
                                 {activeTab === 'all' && (
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl opacity-20 blur-lg"></div>
+                                    <div className="absolute -inset-1 bg-pink-300 rounded-xl opacity-20 blur-lg"></div>
                                 )}
                             </button>
                             
@@ -657,7 +657,7 @@ export default function JobsPage() {
                                 onClick={() => setActiveTab('preferred')}
                                 className={`relative flex-1 py-4 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
                                     activeTab === 'preferred'
-                                        ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg transform scale-105'
+                                        ? 'bg-pink-300 text-white shadow-lg transform scale-105'
                                         : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                             >
@@ -666,14 +666,14 @@ export default function JobsPage() {
                                     <span>Recommended</span>
                                     <div className={`px-2 py-1 rounded-full text-xs font-bold ${
                                         activeTab === 'preferred' 
-                                            ? 'bg-white/20 text-white' 
+                                            ? 'bg-white/20 text-black' 
                                             : 'bg-gray-200 text-gray-600'
                                     }`}>
                                         {preferredJobs.length}
                                     </div>
                                 </div>
                                 {activeTab === 'preferred' && (
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl opacity-20 blur-lg"></div>
+                                    <div className="absolute -inset-1 bg-pink-300 rounded-xl opacity-20 blur-lg"></div>
                                 )}
                             </button>
                         </nav>
@@ -707,7 +707,7 @@ export default function JobsPage() {
                                                 setLocationQuery('');
                                                 setCurrentPage(1);
                                             }}
-                                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                            className="bg-pink-600 text-black px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                                         >
                                             Clear Filters
                                         </button>
@@ -734,13 +734,13 @@ export default function JobsPage() {
                                         <div className="flex flex-wrap gap-2">
                                             {profileData.preferredJobRoles?.map((role, index) => (
                                                 <span key={`role-${index}`} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                    <Briefcase size={12} className="mr-1" />
+                                                    <IconBriefcase size={12} className="mr-1" />
                                                     {role}
                                                 </span>
                                             ))}
                                             {profileData.preferredJobLocations?.map((location, index) => (
                                                 <span key={`location-${index}`} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    <MapPin size={12} className="mr-1" />
+                                                    <IconMapPin size={12} className="mr-1" />
                                                     {location}
                                                 </span>
                                             ))}
@@ -763,7 +763,7 @@ export default function JobsPage() {
                                 {!profileData?.preferredJobRoles?.length && !profileData?.preferredJobLocations?.length && (
                                     <button
                                         onClick={() => router.push(`/${params.id}/profile`)}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                        className="bg-pink-300 text-white px-4 py-2 rounded-lg transition-colors"
                                     >
                                         Set Preferences
                                     </button>

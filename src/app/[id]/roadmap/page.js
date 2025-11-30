@@ -25,7 +25,7 @@ export default function RoadmapPage() {
 
     const skillCategories = [
         {
-            category: "Development",
+            category: "DEVELOPMENT",
             skills: [
                 {
                     id: "frontend",
@@ -45,7 +45,7 @@ export default function RoadmapPage() {
                     difficulty: "Intermediate",
                     duration: "6-8 months",
                     popularity: 88,
-                    color: "green"
+                    color: "blue"
                 },
                 {
                     id: "fullstack",
@@ -55,7 +55,7 @@ export default function RoadmapPage() {
                     difficulty: "Intermediate",
                     duration: "8-12 months",
                     popularity: 92,
-                    color: "purple"
+                    color: "blue"
                 },
                 {
                     id: "ios",
@@ -65,7 +65,7 @@ export default function RoadmapPage() {
                     difficulty: "Intermediate",
                     duration: "6-8 months",
                     popularity: 82,
-                    color: "indigo"
+                    color: "blue"
                 },
                 {
                     id: "android",
@@ -75,12 +75,12 @@ export default function RoadmapPage() {
                     difficulty: "Intermediate",
                     duration: "6-8 months",
                     popularity: 88,
-                    color: "emerald"
+                    color: "blue"
                 }
             ]
         },
         {
-            category: "Data & AI",
+            category: "DATA & AI",
             skills: [
                 {
                     id: "ai-and-data-science",
@@ -90,7 +90,7 @@ export default function RoadmapPage() {
                     difficulty: "Advanced",
                     duration: "10-15 months",
                     popularity: 90,
-                    color: "orange"
+                    color: "blue"
                 },
                 {
                     id: "machine-learning",
@@ -100,7 +100,7 @@ export default function RoadmapPage() {
                     difficulty: "Advanced",
                     duration: "12-18 months",
                     popularity: 87,
-                    color: "red"
+                    color: "blue"
                 },
                 {
                     id: "ai-engineering",
@@ -110,12 +110,12 @@ export default function RoadmapPage() {
                     difficulty: "Expert",
                     duration: "15-20 months",
                     popularity: 82,
-                    color: "pink"
+                    color: "blue"
                 }
             ]
         },
         {
-            category: "Infrastructure & Security",
+            category: "INFRASTRUCTURE & SECURITY",
             skills: [
                 {
                     id: "devops",
@@ -125,7 +125,7 @@ export default function RoadmapPage() {
                     difficulty: "Intermediate",
                     duration: "6-10 months",
                     popularity: 86,
-                    color: "cyan"
+                    color: "blue"
                 },
                 {
                     id: "cybersecurity",
@@ -135,12 +135,12 @@ export default function RoadmapPage() {
                     difficulty: "Advanced",
                     duration: "8-12 months",
                     popularity: 84,
-                    color: "gray"
+                    color: "blue"
                 }
             ]
         },
         {
-            category: "Design & Business",
+            category: "DESIGN AND BUISNESS ",
             skills: [
                 {
                     id: "ui-ux",
@@ -150,7 +150,7 @@ export default function RoadmapPage() {
                     difficulty: "Beginner",
                     duration: "4-8 months",
                     popularity: 89,
-                    color: "pink"
+                    color: "blue"
                 },
                 {
                     id: "product-management",
@@ -160,7 +160,7 @@ export default function RoadmapPage() {
                     difficulty: "Intermediate",
                     duration: "6-10 months",
                     popularity: 83,
-                    color: "yellow"
+                    color: "blue"
                 }
             ]
         }
@@ -195,17 +195,17 @@ export default function RoadmapPage() {
 
     const getIconColor = (color) => {
         const colors = {
-            blue: 'text-blue-600',
-            green: 'text-green-600',
-            purple: 'text-purple-600',
-            indigo: 'text-indigo-600',
-            orange: 'text-orange-600',
-            red: 'text-red-600',
-            pink: 'text-pink-600',
-            cyan: 'text-cyan-600',
-            gray: 'text-gray-600',
-            yellow: 'text-yellow-600',
-            emerald: 'text-emerald-600'
+            blue: 'text-blue-300',
+            green: 'text-green-300',
+            purple: 'text-purple-300',
+            indigo: 'text-indigo-300',
+            orange: 'text-orange-300',
+            red: 'text-red-300',
+            pink: 'text-pink-300',
+            cyan: 'text-cyan-300',
+            gray: 'text-gray-300',
+            yellow: 'text-yellow-300',
+            emerald: 'text-emerald-300'
         };
         return colors[color] || colors.blue;
     };
@@ -242,7 +242,7 @@ export default function RoadmapPage() {
             <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
                     <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <div className="w-10 h-10 bg-blue-300 rounded-xl flex items-center justify-center shadow-lg">
                             <Code className="text-white" size={24} />
                         </div>
                         <div>
@@ -259,8 +259,8 @@ export default function RoadmapPage() {
 
                 {skillCategories.map((category) => (
                     <div key={category.category} className="mb-12">
-                        <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-                            <Zap className="mr-3 text-yellow-500" size={28} />
+                        <h2 className="text-2xl font-extrabold text-gray-800 mb-6 flex justify-center items-center">
+                            
                             {category.category}
                         </h2>
                         
@@ -315,7 +315,7 @@ export default function RoadmapPage() {
                 ))}
 
                 {/* Call to Action */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mt-16">
+                <div className="bg-blue-400 rounded-2xl p-8 text-center text-white mt-16">
                     <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
                     <p className="text-xl mb-6 opacity-90">
                         Choose any skill above to access the official roadmap.sh learning paths with comprehensive guidance.

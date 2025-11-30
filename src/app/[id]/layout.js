@@ -98,8 +98,8 @@ export default function DashboardLayout({ children }) {
                     </button>
                     {!sidebarCollapsed && (
                         <Link href="/">
-                            <h2 className="text-xl font-bold text-gray-800 cursor-pointer hover:text-gray-600 transition-colors">
-                                Hirehead.ai
+                            <h2 className="text-xl font-bold text-gray-800 cursor-pointer hover:text-gray-800 transition-colors">
+                                HIREHEAD.AI
                             </h2>
                         </Link>
                     )}

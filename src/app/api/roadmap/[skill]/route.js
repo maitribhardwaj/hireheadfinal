@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
     try {
-        const { skill } = params;
+        const { skill } = await params;
         
         // Map our skill IDs to roadmap.sh paths
         const roadmapMapping = {
@@ -132,11 +132,20 @@ export async function GET(request, { params }) {
         console.error('❌ Error fetching roadmap:', error);
 
         // Return fallback data on error
-        return NextResponse.json({
-            success: true,
-            data: getFallbackRoadmapData(params.skill),
-            source: 'fallback'
-        });
+        try {
+            const { skill } = await params;
+            return NextResponse.json({
+                success: true,
+                data: getFallbackRoadmapData(skill),
+                source: 'fallback'
+            });
+        } catch (paramsError) {
+            return NextResponse.json({
+                success: true,
+                data: getFallbackRoadmapData('frontend'),
+                source: 'fallback'
+            });
+        }
     }
 }
 
